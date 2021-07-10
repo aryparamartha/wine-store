@@ -1,0 +1,341 @@
+.m-center{
+  margin: 0 auto;
+}
+
+.flt-right{
+  float: right;
+}
+
+.flt-left{
+  float: left;
+}
+
+.mb-20{
+  margin-bottom: 20px;
+}
+
+a.btn-icon svg {
+  margin-top: 7px;
+}
+
+/* .select2-container{
+  width: 100%!important;
+  height: 100%!important;
+}
+
+.select2-container--default .select2-selection--single{
+  height: 100%!important;
+} */
+
+.generate-soal{
+  margin-bottom: 20px;
+  overflow: scroll;
+  overflow: auto;
+  display: block;
+}
+
+.cd-time{
+  padding: 0px;
+  margin-bottom: 0px;
+}
+.cd-time li {
+  display: inline-block;
+  font-size: 17px;
+  list-style-type: none;
+  padding: 1em;
+  text-transform: uppercase;
+}
+
+.cd-time li span {
+  display: block;
+  font-size: 3.4rem;
+}
+
+.card .card-body.jawaban{
+  padding: 0;
+}
+
+.jawaban .form-check{
+  margin-top: 0px!important;
+  margin-bottom: 0px!important;
+  display: inline-block;
+  width: 100%;
+}
+
+.jawaban .form-check .form-check-label{
+  padding: .6rem 1rem;
+  margin-left: 0rem;
+  /* display: table; */
+}
+
+.jawaban .form-check .form-check-label .input-frame{
+  /* position: absolute;
+  left: 0.8rem; */
+  margin-right: 15px;
+}
+
+.jawaban .form-check .form-check-label input[type="radio"] + .input-frame:before {
+  content: "";
+  left: 0;
+  border: solid #727cf5;
+  border-width: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  -webkit-transition: all;
+  -moz-transition: all;
+  -ms-transition: all;
+  -o-transition: all;
+  transition: all;
+  transition-duration: 0s;
+  -webkit-transition-duration: 250ms;
+  transition-duration: 250ms;
+  display: inline-block;
+  vertical-align: middle; 
+  position: unset;
+  /* display: table-cell;
+  vertical-align: middle;
+  position: unset; */
+}
+
+.jawaban .form-check .form-check-label input[type="radio"]:checked + .input-frame:before {
+  background: #ffffff;
+  border: 6px solid #727cf5;
+}
+
+
+.nav-soal{
+  margin-bottom: 5px;
+  width: 58px;
+}
+
+.card .card-body.nav-list-soal{
+  padding: 1.5rem .5rem;
+  text-align: center;
+}
+
+.master-soal-text{
+  text-transform: uppercase;
+  color: #ffffff;
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 0px;
+}
+
+.drop-text .dropify-wrapper{
+  margin-bottom: 15px!important;
+}
+
+.CodeMirror, .CodeMirror-scroll {
+	min-height: 150px;
+}
+
+.form-soal label{
+  font-weight: 600!important;
+}
+
+.has-danger .CodeMirror, .has-danger .editor-toolbar{
+  border-color: #ff3366;
+}
+
+.wizard > .content{
+  min-height: 15rem!important;
+}
+.wizard > .content > .body {
+  width: 100%;
+  height: 100%;
+  padding: 3.5%;
+}
+
+.kolom-huruf-hilang{
+  text-align: center;
+  margin: 0 auto;
+}
+
+.kolom-huruf-hilang tr.petunjuk-soal td>input{
+  font-weight: 900;
+}
+
+.input-huruf h5{
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.right-answer{
+  width: 50px!important;
+  font-weight: 700!important;
+  background-color: #10b759!important;
+  border: 1px solid #10b759!important;
+  color: white!important;
+}
+
+.answer{
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: calc(100% - 25px);
+  right: -14px;
+  z-index: 100;
+  background-color: #10b759!important;
+  border: 1px solid #10b759;
+  padding: 0.3rem 0.3rem;
+  text-align: center;
+  color: white;
+}
+
+.soal-gambar{
+  max-height: 115px;
+  max-width: 100%;
+}
+
+.jawaban img{
+  max-height: 70px;
+  max-width: 100%;
+}
+
+.pagination {
+  justify-content: center;
+}
+
+.table-review thead th {
+  color: #191919!important;
+}
+
+.table-review td img {
+  width: unset!important;
+  height: unset!important;
+  border-radius: unset!important;
+  max-width: 100%!important;
+}
+
+.table-review td {
+  font-size: 0.9567rem!important;
+  font-weight: 800!important;
+}
+
+.icon-course{
+  font-size: 39px;
+  color: #364dcc;
+}
+
+.course-time{
+  font-size: small!important;
+}
+
+.time-course{
+  color: #d50000!important;
+}
+
+.course-title{
+  color: #004a6e!important;
+}
+
+.table.course{
+  padding: 8px!important;
+  border-bottom: 1px solid #e8ebf1!important;
+}
+
+.table.course td {
+  padding: 8px!important;
+  border-top: none!important;
+  border-bottom: 1px solid #e8ebf1!important;
+}
+
+.table.course tr:last-child td {
+  border-bottom: 0!important;
+}
+
+.table.course tr td:last-child{
+  text-align: center;
+  font-weight: 700;
+}
+
+#btn-finish{
+  width: inherit;
+  height: 40px;
+  font-size: larger;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+
+#loader-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  background: #343434f2;
+}
+
+#loader {
+  display: block;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #3498db;
+
+  -webkit-animation: spin 2s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
+  animation: spin 2s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+}
+
+#loader:before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #e74c3c;
+
+  -webkit-animation: spin 3s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
+  animation: spin 3s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+}
+
+#loader:after {
+    content: "";
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    border-top-color: #f9c922;
+
+    -webkit-animation: spin 1.5s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
+      animation: spin 1.5s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+}
+
+@-webkit-keyframes spin {
+    0%   { 
+        -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+        -ms-transform: rotate(0deg);  /* IE 9 */
+        transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
+    }
+    100% {
+        -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+        -ms-transform: rotate(360deg);  /* IE 9 */
+        transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
+    }
+}
+@keyframes spin {
+    0%   { 
+        -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+        -ms-transform: rotate(0deg);  /* IE 9 */
+        transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
+    }
+    100% {
+        -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+        -ms-transform: rotate(360deg);  /* IE 9 */
+        transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
+    }
+}
+
