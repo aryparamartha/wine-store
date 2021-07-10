@@ -64,6 +64,7 @@
                     <input type="hidden" name="goods_id[]" class="cart-goods-id" />
                     <input type="hidden" name="price[]" class="cart-price" />
                     <input type="hidden" name="unit_id[]" class="cart-unit-id" />
+                    <input type="hidden" name="sub_total[]" class="cart-sub-total-input" />
                     <select class="cart-goods select-goods form-control" style="width:100% !important" required>
                         <option></option>
                         @foreach($goods as $good)
@@ -72,6 +73,7 @@
                     </select>
                 </td>
                 <td><input type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value="" required autofocus></td>
+                <td><input type="text" class="cart-disc form-control" name="disc[]" placeholder="Disc" value="" autofocus></td>
                 <td class="cart-unit"></td>
                 <td class="cart-sub-total text-right"></td>
                 <td>
@@ -88,30 +90,44 @@
         });
         $("#goods-cart").on('change', '.select-goods', change_selected_goods)
         $("#goods-cart").on('change', '.cart-qty', change_qty)
+        $("#goods-cart").on('change', '.cart-disc', change_disc)
         $("#goods-cart").on('click', '.btn-dlt-cart', delete_cart)
 
-        function change_qty(){
-            console.log(1)
-            let index = $(this).index(".cart-qty"); 
-            let price = JSON.parse($(".cart-price").eq(index).val());
-            let qty = $(this).val();
-            $(".cart-sub-total").eq(index).html(showCurrency(price * qty))
-            $(".cart-sub-total").eq(index).data("val", price * qty)
+        function calculate_sub_total(index){
+            let price = $(".cart-price").eq(index).val();
+            let qty = $(".cart-qty").eq(index).val();
+            let disc = $(".cart-disc").eq(index).val();
+
+            let sub_total = price * qty;
+            sub_total = sub_total * ((100 - disc) / 100);
+            
+            $(".cart-sub-total").eq(index).html(showCurrency(sub_total))
+            $(".cart-sub-total").eq(index).data("val", sub_total)
+            $(".cart-sub-total-input").eq(index).val(sub_total)
+
             calculate_total();
+        }
+
+        function change_disc(){
+            let index = $(this).index(".cart-disc"); 
+            calculate_sub_total(index)
+        }
+
+        function change_qty(){
+            let index = $(this).index(".cart-qty");
+            calculate_sub_total(index)
         }
 
         function change_selected_goods(){
             let index = $(this).index(".select-goods"); 
             let goods = JSON.parse($(this).val());
-            let qty = $(".cart-qty").eq(index).val()
-            console.log(goods.id + " " + goods.unit.id)
+
             $(".cart-goods-id").eq(index).val(goods.id)
-            $(".cart-price").eq(index).val(goods.price)
+            $(".cart-price").eq(index).val(goods.purchase_price)
             $(".cart-unit-id").eq(index).val(goods.unit.id)
             $(".cart-unit").eq(index).html(goods.unit.name)
-            $(".cart-sub-total").eq(index).html(showCurrency(goods.price * qty))
-            $(".cart-sub-total").eq(index).data("val", goods.price * qty)
-            calculate_total();
+
+            calculate_sub_total(index)
         }
 
         function delete_cart(){
@@ -177,7 +193,7 @@
 @endsection
 
 @section('content')
-<form name="memberForm" class="forms-sample" action="{{route('tx.regular.update', $tx)}}" method="POST">
+<form name="memberForm" class="forms-sample" action="{{route('tx.compliment.update', $tx)}}" method="POST" enctype='multipart/form-data'>
     @csrf
 <div class="page-content">
     <div class="row">
@@ -255,7 +271,7 @@
                                 <div id="transfer-proof-body" class="col-md-12" style="display: none !important">
 									<div class="form-group">
 										<label>Upload Transfer Proof</label>
-										<input type="file" name="img[]" class="file-upload-default">
+										<input type="file" name="tf_proof" class="file-upload-default">
 										<div class="input-group col-xs-12">
 											<input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Image">
 											<span class="input-group-append">
@@ -291,8 +307,9 @@
                                             <th>#</th>
                                             <th width="40%">Name</th>
                                             <th style="min-width:105px">Qty</th>
+                                            <th style="min-width:90px">Disc(%)</th>
                                             <th>Unit</th>
-                                            <th>Price</th>
+                                            <th>Sub Total</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -304,6 +321,7 @@
                                                 <input value="{{$detail->goods_id}}" type="hidden" name="goods_id[]" class="cart-goods-id" />
                                                 <input value="{{$detail->price}}" type="hidden" name="price[]" class="cart-price" />
                                                 <input value="{{$detail->unit_id}}" type="hidden" name="unit_id[]" class="cart-unit-id" />
+                                                <input value="{{$detail->sub_total}}" type="hidden" name="sub_total[]" class="cart-sub-total-input" />
                                                 <select class="cart-goods select-goods form-control" style="width:100% !important" required>
                                                     <option></option>
                                                     @foreach($goods as $good)
@@ -312,8 +330,9 @@
                                                 </select>
                                             </td>
                                             <td><input type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value="{{$detail->qty}}" required autofocus></td>
+                                            <td><input type="text" class="cart-disc form-control" name="disc[]" placeholder="Disc" value="{{$detail->disc}}" autofocus></td>
                                             <td class="cart-unit">{{$detail->unit->name}}</td>
-                                            <td data-val="{{$detail->price * $detail->qty}}" class="cart-sub-total text-right">{{$tx->showCurrency($detail->price * $detail->qty)}}</td>
+                                            <td data-val="{{$detail->sub_total}}" class="cart-sub-total text-right">{{$tx->showCurrency($detail->sub_total)}}</td>
                                             <td>
                                                 <button type="button" class="btn-dlt-cart btn btn-danger btn-icon" data-title="Delete Goods" data-text="Are you sure you want to delete this data?">
                                                     <i data-feather="trash"></i>
@@ -333,28 +352,21 @@
                                         </tr>
 
                                         <tr>
-                                            <td colspan=4 class="text-right">Total:</td>
+                                            <td colspan=5 class="text-right">Total:</td>
                                             <td class="cart-total text-right">{{$tx->showCurrency($tx->total)}}</td>
                                         </tr>
                                         <tr>
-                                            <td colspan=4 class="text-right">Tax (10%):</td>
+                                            <td colspan=5 class="text-right">Tax (10%):</td>
                                             <td class="cart-tax text-right">{{$tx->showCurrency($tx->tax)}}</td>
                                         </tr>
                                         <tr>
-                                            <td colspan=4 class="text-right">Grand Total:</td>
+                                            <td colspan=5 class="text-right">Grand Total:</td>
                                             <td class="cart-grand-total text-right">{{$tx->showCurrency($tx->grand_total)}}</td>
                                         </tr>
                                     </tfoot>
                                 </table>
                             </div>
                         </div>
-                        <!--
-                        <div class="col-md-12">
-                            <button id="btn-add-goods" type="button" class="btn btn-primary btn-icon w-100" data-title="Delete Goods" data-text="Are you sure you want to delete this data?">
-                                <i data-feather="plus"></i>ADD ITEM
-                            </button>
-                        </div>
-                        -->
                     </div>
                 </div>
             </div>

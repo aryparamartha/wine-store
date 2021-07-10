@@ -89,7 +89,7 @@
                     </div>
                     <div class="col-md-6 col-6">
                         <div class="flt-right">
-                            <img height="200px" width="200px" src="/{{$comp_profile->logo}}" />
+                            <img max-height="110px" width="110px" src="/{{$comp_profile->logo}}" />
                         </div>  
                     </div>
                 </div>

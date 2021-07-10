@@ -129,7 +129,7 @@ class ComplimentTxController extends Controller
 
         //upload
         if($request->file('tf_proof') != null){
-            $tx->transfer_proof = $tx->id . "_" . $tx->invoice_id . "_transfer." . $request->file('tf_proof')->getClientOriginalExtension();
+            $tx->transfer_proof = $tx->invoice_id . "_transfer." . $request->file('tf_proof')->getClientOriginalExtension();
             $tx->uploadPhoto($request->file('tf_proof'), $tx->transfer_proof);
         }
 
@@ -148,9 +148,9 @@ class ComplimentTxController extends Controller
             DB::beginTransaction();
 
             $tx->save();
-            DetComplTx::where('regular_tx_id', $tx->id)->delete();
+            DetComplTx::where('compliment_tx_id', $tx->id)->delete();
             foreach($tx_details as $detail) {
-                $detail->regular_tx_id = $tx->id;
+                $detail->compliment_tx_id = $tx->id;
                 $detail->save();
             }
             DB::commit();
