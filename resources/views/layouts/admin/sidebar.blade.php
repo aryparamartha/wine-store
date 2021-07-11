@@ -72,9 +72,9 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{route('client.index')}}" class="nav-link">
+                <a href="{{route('receiving.index')}}" class="nav-link">
                     <i class="link-icon" data-feather="plus-square"></i>
-                    <span class="link-title">Incoming Goods</span>
+                    <span class="link-title">Receiving</span>
                 </a>
             </li>
             <li class="nav-item">

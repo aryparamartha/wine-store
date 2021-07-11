@@ -122,6 +122,15 @@ Route::group(['prefix' => 'goods'], function()
     Route::post('/delete/{goods}', 'GoodsController@destroy')->name('goods.delete');
 });
 
+Route::group(['prefix' => 'receiving'], function()
+{
+    Route::get('/', 'ReceivingController@index')->name('receiving.index');
+    Route::get('/new', 'ReceivingController@create')->name('receiving.new');
+    Route::post('/store', 'ReceivingController@store')->name('receiving.store');
+    Route::post('/delete/{receiving}', 'ReceivingController@destroy')->name('receiving.delete');
+    Route::get('/invoice/{receiving}', 'ReceivingController@invoice')->name('receiving.invoice');
+});
+
 Route::group(['prefix' => 'breakage'], function()
 {
     Route::get('/', 'BreakageController@index')->name('breakage.index');
