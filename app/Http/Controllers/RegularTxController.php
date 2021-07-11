@@ -54,7 +54,7 @@ class RegularTxController extends Controller
         $tx->payment_type = $input['payment_type'];
         $tx->status = $input['status'];
 
-        if($input['status']=='paid'){
+        if($tx->status=='paid'){
             $tx->payment_date =  Carbon::now()->format('Y-m-d H:i:s');
         }
 
@@ -64,25 +64,28 @@ class RegularTxController extends Controller
             $tx->uploadPhoto($request->file('tf_proof'), $tx->transfer_proof);
         }
 
-        $tx_details = [];
-        foreach($input['goods_id'] as $key => $goods_id){
-            $detail = new DetRegTx;
-            $detail->goods_id = $goods_id;
-            $detail->qty = $input['qty'][$key];
-            $detail->unit_id = $input['unit_id'][$key];
-            $detail->price = $input['price'][$key];
-            $detail->sub_total = $input['sub_total'][$key];
-            $tx_details[] = $detail;
-        }
         try{
             DB::beginTransaction();
 
             $tx->save();
 
-            foreach($tx_details as $detail) {
+            $tx_details = [];
+            foreach($input['goods_id'] as $key => $goods_id){
+                $detail = new DetRegTx;
                 $detail->regular_tx_id = $tx->id;
-                $detail->save();
+                $detail->goods_id = $goods_id;
+                $detail->qty = $input['qty'][$key];
+                $detail->unit_id = $input['unit_id'][$key];
+                $detail->price = $input['price'][$key];
+                $detail->sub_total = $input['sub_total'][$key];
+                $tx_details[] = $detail->attributesToArray();
+
+                if($tx->status=='paid'){
+                    Goods::where("id", $detail['goods_id'])->update(["amount" => DB::raw("amount - " . $detail['qty'])]);
+                }
             }
+            DetRegTx::insert($tx_details);
+
             DB::commit();
             $notif = [
                 "type" => "success",
@@ -90,6 +93,7 @@ class RegularTxController extends Controller
             ];
         }catch(\Exception $e){
             DB::rollback();
+            die($e);
             if($request->file('tf_proof') != null){
                 File::delete($tx->getPublicPath($tx->transfer_proof));
             }
@@ -123,7 +127,7 @@ class RegularTxController extends Controller
         $tx->payment_type = $input['payment_type'];
         $tx->status = $input['status'];
         
-        if($input['status']=='paid'){
+        if($tx->status=='paid'){
             $tx->payment_date =  Carbon::now()->format('Y-m-d H:i:s');
         }
 
@@ -133,25 +137,29 @@ class RegularTxController extends Controller
             $tx->uploadPhoto($request->file('tf_proof'), $tx->transfer_proof);
         }
 
-        $tx_details = [];
-        foreach($input['goods_id'] as $key => $goods_id){
-            $detail = new DetRegTx;
-            $detail->goods_id = $goods_id;
-            $detail->qty = $input['qty'][$key];
-            $detail->unit_id = $input['unit_id'][$key];
-            $detail->price = $input['price'][$key];
-            $detail->sub_total = $input['sub_total'][$key];
-            $tx_details[] = $detail;
-        }
         try{
             DB::beginTransaction();
 
             $tx->save();
             DetRegTx::where('regular_tx_id', $tx->id)->delete();
-            foreach($tx_details as $detail) {
+            
+            $tx_details = [];
+            foreach($input['goods_id'] as $key => $goods_id){
+                $detail = new DetRegTx;
                 $detail->regular_tx_id = $tx->id;
-                $detail->save();
+                $detail->goods_id = $goods_id;
+                $detail->qty = $input['qty'][$key];
+                $detail->unit_id = $input['unit_id'][$key];
+                $detail->price = $input['price'][$key];
+                $detail->sub_total = $input['sub_total'][$key];
+                $tx_details[] = $detail->attributesToArray();
+                
+                if($tx->status=='paid'){
+                    Goods::where("id", $detail['goods_id'])->update(["amount" => DB::raw("amount - " . $detail['qty'])]);
+                }
             }
+            DetRegTx::insert($tx_details);
+            
             DB::commit();
             $notif = [
                 "type" => "success",
