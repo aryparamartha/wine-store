@@ -17,11 +17,25 @@ class GoodsController extends Controller
         return view('goods.index', compact('goods', 'units'));
     }
 
+    public function insert(Request $request)
+    {
+        $input = $request->all();
+        $goods = Goods::create($input);
+        return $goods;
+    }
+
+    public function storeAPI(Request $request){
+        $goods = $this->insert($request);
+        $response['status'] = 200;
+        $response['message'] = "Success insert goods";
+        $response['data'] = Goods::where("id", $goods->id)->with('unit')->first();
+
+        return response()->json($response, 200);
+    }
+
     public function store(Request $request)
     { 
-        $input = $request->all();
-        $input['added_by'] = Auth::user()->id;
-        $goods = Goods::create($input);
+        $this->insert($request);
         return redirect()->route('goods.index')->with('success', 'New goods has been saved!');
     }
 

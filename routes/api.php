@@ -17,8 +17,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('konsumen/login', 'KonsumenController@login')->name('konsumen.login');
-Route::post('konsumen/register', 'KonsumenController@register')->name('konsumen.register');
-Route::get('konsumen/pengerjaan_aktif/{id}', 'PengerjaanController@getPengerjaanAktif')->name('konsumen.pengerjaan_aktif');
-Route::get('konsumen/pengerjaan_selesai/{id}', 'PengerjaanController@getPengerjaanSelesai')->name('konsumen.pengerjaan_selesai');
-Route::post('konsumen/update/{id}', 'KonsumenController@update_profil')->name('konsumen.update');
+Route::post('goods/add', 'GoodsController@storeAPI')->name('goods.add');

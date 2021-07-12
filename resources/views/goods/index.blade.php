@@ -187,6 +187,7 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" name="id" id="id">
+                <input value="{{ Auth::user()->id }}" type="hidden" name="added_by" id="added_by">
                 <div class="form-group">
                     <label for="code">Code</label>
                     <input type="text" class="form-control" id="code" name="code" required autofocus>                     

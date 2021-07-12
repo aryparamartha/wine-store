@@ -8,6 +8,7 @@ use App\DetReceiving;
 use App\Goods;
 use App\Receiving;
 use App\Seller;
+use App\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -34,7 +35,8 @@ class ReceivingController extends Controller
     public function create(){
         $goods = Goods::with('unit')->get();
         $suppliers = Supplier::get();
-        return view('receiving.create', compact('goods', 'suppliers'));
+        $units = Unit::get();
+        return view('receiving.create', compact('goods', 'suppliers', 'units'));
     }
 
     public function store(Request $request)

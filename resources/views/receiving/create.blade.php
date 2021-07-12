@@ -27,6 +27,7 @@
         $("#supplier_id").select2({placeholder: "Select Customer"});
         $("#seller_id").select2({placeholder: "Select Seller"});
         $(".select-goods").select2({placeholder: "Select Goods"});
+        $("#unit_id").select2({placeholder: "Select Unit"});
     });
 </script>
 <script>
@@ -55,6 +56,7 @@
         @endif   
 
         var total = 0;
+        var new_goods_template = "";
 
         $("#btn-add-goods").click(function(){
             let template = `
@@ -68,6 +70,7 @@
                         @foreach($goods as $good)
                         <option value="{{$good}}">{{$good->code}} - {{$good->name}}</option>
                         @endforeach
+                        `+ new_goods_template +`
                     </select>
                 </td>
                 <td><input type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value="" required autofocus></td>
@@ -129,6 +132,43 @@
                 $( this ).html(index + 1);
             });
         }
+
+        $('#btn-new-goods').click(function () {
+            $('#code').val("");
+            $('#name').val("");
+            $('#unit_id').val("");
+            $('#amount').val("");
+            $('#purchase_price').val("");
+            $('#selling_price').val("");
+            $('#goods-modal').modal('show');
+        });
+
+        $("#goods-form").submit(function(e){
+            e.preventDefault();
+            let form = $(this);
+            
+            $.ajax({
+                type: "POST",
+                url: form.attr('action'),
+                data: form.serialize(),
+                success: function(response) {
+                    let goods = response.data;
+                    let new_item = `<option value='`+JSON.stringify(goods)+`'>`+goods.code+` - `+goods.name+`</option>`;
+                    new_goods_template += new_item;
+                    $('#goods-modal').modal('hide');
+                    $(".select-goods").append(new_item);
+                    $(".select-goods").select2({placeholder: "Select Goods"});
+                }, 
+                fail: function(){
+                    Swal.fire({
+                        type: 'error',
+                        title: "Failed to add new goods! Please check your internet connection! ",
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }
+            });
+        })
     });   
 </script>
 @endsection
@@ -206,9 +246,9 @@
                         </div>
                         <div class="col-md-6 col-6">
                             <div class="flt-right" style="float: right">
-                                <a class="btn btn-success btn-icon-text btn-edit-profile" href="{{route('receiving.new')}}" id="btn-add-breakage" >
+                                <button id="btn-new-goods" class="btn btn-success btn-icon-text btn-edit-profile">
                                     <i data-feather="plus" class="btn-icon-prepend"></i> Create Goods
-                                </a>
+                                </button>
                             </div>  
                         </div>
                         <div class="col-md-12">
@@ -275,4 +315,60 @@
     </div>
 </div>
 </form>
+
+
+{{-- Modal --}}
+<div class="modal fade" id="goods-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">        
+        <form id="goods-form" class="forms-sample" action="{{route('goods.add')}}" method="POST">
+            @csrf
+            <div class="modal-header">
+                <h5 class="modal-title" id="goods-modal-title">Add New Goods</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="id" id="id">
+                <input value="{{ Auth::user()->id }}" type="hidden" name="added_by" id="added_by">
+                <div class="form-group">
+                    <label for="code">Code</label>
+                    <input type="text" class="form-control" id="code" name="code" required autofocus>                     
+                </div>      
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required autofocus>                     
+                </div>      
+                <div class="form-group">
+                    <label for="unit" class="w-100">Unit</label>
+                    <select id="unit_id" name="unit_id" class="w-100" required>
+                        <option></option>
+                        @foreach($units as $unit)
+                        <option value="{{$unit->id}}">{{$unit->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="amount">Amount</label>
+                    <input type="number" class="form-control" id="amount" name="amount" required autofocus>                     
+                </div>
+                <div class="form-group">
+                    <label for="purchase_price">Purchase Price</label>
+                    <input type="number" class="form-control" id="purchase_price" name="purchase_price" required autofocus>                     
+                </div>
+                <div class="form-group">
+                    <label for="selling_price">Selling Price</label>
+                    <input type="number" class="form-control" id="selling_price" name="selling_price" required autofocus>                     
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="btnSave" value="create" type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+{{-- Modal --}}
 @endsection
