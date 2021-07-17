@@ -11,7 +11,9 @@ class DetReceiving extends Model
         'goods_id',
         'qty',
         'unit_id',
+        'price',
         'sub_total',
+        'tax',
     ];
 
     public function receiving()

@@ -28,8 +28,8 @@ class ReceivingController extends Controller
     
     public function invoice(Receiving $receiving){
         $comp_profile = CompanyProfile::find(1);
-        $items = DetReceiving::with('goods','unit')->where('regular_tx_id', '=', $receiving->id)->get();
-        return view('transaction.invoice', compact('receiving', 'items', 'comp_profile'));
+        $items = DetReceiving::with('goods','unit')->where('receiving_id', '=', $receiving->id)->get();
+        return view('receiving.invoice', compact('receiving', 'items', 'comp_profile'));
     }
 
     public function create(){
@@ -57,6 +57,7 @@ class ReceivingController extends Controller
             $detail->goods_id = $goods_id;
             $detail->qty = $input['qty'][$key];
             $detail->unit_id = $input['unit_id'][$key];
+            $detail->price = $input['price'][$key];
             $detail->sub_total = $input['sub_total'][$key];
             $receiving_details[] = $detail;
         }

@@ -20,6 +20,16 @@
 <script src="{{asset('assets/js/file-upload.js')}}"></script>
 @endsection
 
+@section('custom-css')
+<style>
+    .readable {
+        width: 100%;
+        height: 100%;
+        display:block;
+    }
+</style>
+@endsection
+
 @section('custom-js')
 <script src="{{asset('assets/js/data-table.js')}}"></script>
 <script>
@@ -75,9 +85,8 @@
                 </td>
                 <td><input type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value="" required autofocus></td>
                 <td class="cart-unit"></td>
-                <td>
-                    <input type="text" name="sub_total[]" class="cart-sub-total form-control" />
-                </td>
+                <td><input type="text" name="price[]" class="cart-price form-control" /></td>
+                <td><input type="text" name="sub_total[]" class="cart-sub-total form-control" /></td>
                 <td>
                     <button type="button" class="btn-dlt-cart btn btn-danger btn-icon" data-title="Delete Goods" data-text="Are you sure you want to delete this data?">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
@@ -103,7 +112,6 @@
             let sub_total = goods.selling_price * qty;
 
             $(".cart-goods-id").eq(index).val(goods.id)
-            $(".cart-price").eq(index).val(goods.selling_price)
             $(".cart-unit-id").eq(index).val(goods.unit.id)
             $(".cart-unit").eq(index).html(goods.unit.name)
             calculate_total();
@@ -123,8 +131,6 @@
             });
             
             $("#grand_total").val(total);
-
-            $(".cart-grand-total").html(showCurrency(total));
         }
 
         function render_cart_number(){
@@ -178,7 +184,7 @@
     @csrf
 <div class="page-content">
     <div class="row">
-        <div class="col-md-4 grid-margin">
+        <div class="col-md-3 grid-margin">
             <div class="row">
                 <div class="col-md-12 grid-margin">
                     <div class="card">
@@ -220,10 +226,7 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="name">Total</label>
-                                        <h3 class="cart-grand-total text-right">Rp0</h3>
-                                        <input type="hidden" id="total" name="total" value="0">
-                                        <input type="hidden" id="tax" name="tax" value="0">
-                                        <input type="hidden" id="grand_total" name="grand_total" value="0">
+                                        <input type="text" id="grand_total" class="form-control" name="grand_total" value="0">
                                     </div>
                                 </div>
                                 <div class="col-md-12">
@@ -237,7 +240,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-8 grid-margin stretch-card">
+        <div class="col-md-9 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
                     <div class="row">
@@ -253,13 +256,14 @@
                         </div>
                         <div class="col-md-12">
                             <div class="table-responsive">
-                                <table class="table">
+                                <table class="table easy-edit">
                                     <thead>
                                         <tr>
                                             <th>#</th>
                                             <th width="40%">Name</th>
-                                            <th style="min-width:60px">Qty</th>
+                                            <th style="min-width:90px">Qty</th>
                                             <th>Unit</th>
+                                            <th style="min-width:120px">Price</th>
                                             <th style="min-width:120px">Sub Total</th>
                                             <th>Action</th>
                                         </tr>
@@ -279,9 +283,8 @@
                                             </td>
                                             <td><input type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value="" required autofocus></td>
                                             <td class="cart-unit"></td>
-                                            <td>
-                                                <input type="text" name="sub_total[]" class="cart-sub-total form-control" />
-                                            </td>
+                                            <td><input type="text" name="price[]" class="cart-price form-control" /></td>
+                                            <td><input type="text" name="sub_total[]" class="cart-sub-total form-control" /></td>
                                             <td>
                                                 <button type="button" class="btn-dlt-cart btn btn-danger btn-icon" data-title="Delete Goods" data-text="Are you sure you want to delete this data?">
                                                     <i data-feather="trash"></i>
@@ -292,16 +295,11 @@
                                     <tfoot>
                                         
                                         <tr>
-                                            <td colspan=5>           
+                                            <td colspan=6>           
                                                 <button id="btn-add-goods" type="button" class="btn btn-primary btn-icon w-100" data-title="Delete Goods" data-text="Are you sure you want to delete this data?">
                                                     <i data-feather="plus"></i>ADD ITEM
                                                 </button>
                                             </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td colspan=4 class="text-right">Grand Total:</td>
-                                            <td class="cart-grand-total text-right">-</td>
                                         </tr>
                                     </tfoot>
                                 </table>
