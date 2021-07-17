@@ -125,10 +125,10 @@
                         </tbody>
                         <tfoot>
                             <?php $colspan = (isset($item->disc))? 6 : 5; ?>
-                            <tr>
+                            <!-- <tr>
                                 <td colspan={{$colspan}} class="text-right">Total :</td>
                                 <td class="cart-total text-right">{{ $tx->showCurrency($tx->total) }}</td>
-                            </tr>
+                            </tr> -->
                             <tr>
                                 <td colspan={{$colspan}} class="text-right">Tax (10%) :</td>
                                 <td class="cart-tax text-right">{{ $tx->showCurrency($tx->tax) }}</td>

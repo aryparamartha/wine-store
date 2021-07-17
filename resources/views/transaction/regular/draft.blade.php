@@ -30,9 +30,11 @@
     });
 </script>
 <script>
+    const truncateByDecimalPlace = (value, numDecimalPlaces) => Math.trunc(value * Math.pow(10, numDecimalPlaces)) / Math.pow(10, numDecimalPlaces)
     function numberWithCommas(x) {
-        var parts = x.toString().split(",");
+        var parts = x.toString().replace(".",",").split(",");
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        if(typeof parts[1] == 'undefined') parts[1] = "00";
         return parts.join(",");
     }
 
@@ -131,15 +133,15 @@
             $(".cart-sub-total").each(function( index ) {
                 total+= parseInt($(this).data("val"));
             });
-            let tax = 0.1 * total;
-            let grand_total = total + tax;
+            let tax = 1/11 * total;
+            let grand_total = total;
             
             $("#total").val(total);
-            $("#tax").val(tax);
+            $("#tax").val(tax.toFixed(2));
             $("#grand_total").val(grand_total);
 
             $(".cart-total").html(showCurrency(total));
-            $(".cart-tax").html(showCurrency(tax));
+            $(".cart-tax").html(showCurrency(tax.toFixed(2)));
             $(".cart-grand-total").html(showCurrency(grand_total));
         }
 
@@ -309,6 +311,7 @@
                                                 <input value="{{$detail->goods_id}}" type="hidden" name="goods_id[]" class="cart-goods-id" />
                                                 <input value="{{$detail->price}}" type="hidden" name="price[]" class="cart-price" />
                                                 <input value="{{$detail->unit_id}}" type="hidden" name="unit_id[]" class="cart-unit-id" />
+                                                <input value="{{$detail->sub_total}}" type="hidden" name="sub_total[]" class="cart-sub-total-input" />
                                                 <select class="cart-goods select-goods form-control" style="width:100% !important" required>
                                                     <option></option>
                                                     @foreach($goods as $good)
@@ -337,10 +340,10 @@
                                             </td>
                                         </tr>
 
-                                        <tr>
+                                        <!-- <tr>
                                             <td colspan=4 class="text-right">Total:</td>
                                             <td class="cart-total text-right">{{$tx->showCurrency($tx->total)}}</td>
-                                        </tr>
+                                        </tr> -->
                                         <tr>
                                             <td colspan=4 class="text-right">Tax (10%):</td>
                                             <td class="cart-tax text-right">{{$tx->showCurrency($tx->tax)}}</td>

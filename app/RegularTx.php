@@ -37,7 +37,7 @@ class RegularTx extends Model
     }
 
     public function showCurrency($n){
-        return "Rp".number_format($n, 0, "", ".");
+        return "Rp".number_format($n, 2, ",", ".");
     }
 
     public function localTz($carbon){

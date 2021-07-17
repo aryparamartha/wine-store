@@ -30,9 +30,11 @@
     });
 </script>
 <script>
+    const truncateByDecimalPlace = (value, numDecimalPlaces) => Math.trunc(value * Math.pow(10, numDecimalPlaces)) / Math.pow(10, numDecimalPlaces)
     function numberWithCommas(x) {
-        var parts = x.toString().split(",");
+        var parts = x.toString().replace(".",",").split(",");
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        if(typeof parts[1] == 'undefined') parts[1] = "00";
         return parts.join(",");
     }
 
@@ -62,7 +64,6 @@
                 <td class="cart-no">1</td>
                 <td>
                     <input type="hidden" name="goods_id[]" class="cart-goods-id" />
-                    <input type="hidden" name="price[]" class="cart-price" />
                     <input type="hidden" name="unit_id[]" class="cart-unit-id" />
                     <input type="hidden" name="sub_total[]" class="cart-sub-total-input" />
                     <select class="cart-goods select-goods form-control" style="width:100% !important" required>
@@ -73,8 +74,14 @@
                     </select>
                 </td>
                 <td><input type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value="" required autofocus></td>
-                <td><input type="text" class="cart-disc form-control" name="disc[]" placeholder="Disc" value="" autofocus></td>
                 <td class="cart-unit"></td>
+                <td><input type="text" class="cart-price form-control" name="price[]" /></td>
+                <td>
+                    <div style="display: block">%
+                    <input style="display: inline-block; width: 60px !important" type="text" class="cart-disc form-control" name="disc[]" placeholder="Disc" value="" autofocus>
+                    Rp<input style="display: inline-block; width: 100px !important" type="text" class="cart-disc-price form-control" />
+                    </div>
+                </td>
                 <td class="cart-sub-total text-right"></td>
                 <td>
                     <button type="button" class="btn-dlt-cart btn btn-danger btn-icon" data-title="Delete Goods" data-text="Are you sure you want to delete this data?">
@@ -90,27 +97,70 @@
         });
         $("#goods-cart").on('change', '.select-goods', change_selected_goods)
         $("#goods-cart").on('change', '.cart-qty', change_qty)
+        $("#goods-cart").on('change', '.cart-price', change_price)
         $("#goods-cart").on('change', '.cart-disc', change_disc)
+        $("#goods-cart").on('change', '.cart-disc-price', change_disc_price)
         $("#goods-cart").on('click', '.btn-dlt-cart', delete_cart)
 
         function calculate_sub_total(index){
             let price = $(".cart-price").eq(index).val();
             let qty = $(".cart-qty").eq(index).val();
             let disc = $(".cart-disc").eq(index).val();
+            let disc_price = $(".cart-disc-price").eq(index).val();
 
             let sub_total = price * qty;
-            sub_total = sub_total * ((100 - disc) / 100);
+            sub_total = sub_total - disc_price;
             
             $(".cart-sub-total").eq(index).html(showCurrency(sub_total))
             $(".cart-sub-total").eq(index).data("val", sub_total)
             $(".cart-sub-total-input").eq(index).val(sub_total)
+        }
 
+        function change_price(){
+            let index = $(this).index(".cart-price"); 
+
+            let price = $(this).val();
+            let qty = $(".cart-qty").eq(index).val();
+            let disc = $(".cart-disc").eq(index).val();
+            
+            let sub_total = price * qty;
+            let discount = sub_total * ( disc / 100);
+
+            $(".cart-disc-price").eq(index).val(discount)
+            change_discount(index);
+        }
+
+        function change_discount(index){
+            calculate_sub_total(index)
             calculate_total();
         }
 
         function change_disc(){
             let index = $(this).index(".cart-disc"); 
-            calculate_sub_total(index)
+            
+            let price = $(".cart-price").eq(index).val();
+            let qty = $(".cart-qty").eq(index).val();
+            let disc = $(this).val();
+            
+            let sub_total = price * qty;
+            let discount = sub_total * ( disc / 100);
+
+            $(".cart-disc-price").eq(index).val(discount)
+            change_discount(index);
+        }
+        
+        function change_disc_price(){
+            let index = $(this).index(".cart-disc-price"); 
+            
+            let price = $(".cart-price").eq(index).val();
+            let qty = $(".cart-qty").eq(index).val();
+            let disc_price = $(this).val();
+            
+            let sub_total = price * qty;
+            let discount = (disc_price/sub_total)*100;
+
+            $(".cart-disc").eq(index).val(discount)
+            change_discount(index);
         }
 
         function change_qty(){
@@ -139,18 +189,18 @@
 
         function calculate_total(){
             let total = 0;
-            $(".cart-sub-total").each(function( index ) {
-                total+= parseInt($(this).data("val"));
+            $(".cart-sub-total-input").each(function( index ) {
+                total+= parseInt($(this).val());
             });
-            let tax = 0.1 * total;
-            let grand_total = total + tax;
+            let tax = 1/11 * total;
+            let grand_total = total;
             
             $("#total").val(total);
-            $("#tax").val(tax);
+            $("#tax").val(tax.toFixed(2));
             $("#grand_total").val(grand_total);
 
             $(".cart-total").html(showCurrency(total));
-            $(".cart-tax").html(showCurrency(tax));
+            $(".cart-tax").html(showCurrency(tax.toFixed(2)));
             $(".cart-grand-total").html(showCurrency(grand_total));
         }
 
@@ -197,7 +247,7 @@
     @csrf
 <div class="page-content">
     <div class="row">
-        <div class="col-md-4 grid-margin">
+        <div class="col-md-3 grid-margin">
             <div class="row">
                 <div class="col-md-12 grid-margin">
                     <div class="card">
@@ -251,12 +301,12 @@
                                         <input type="hidden" id="grand_total" name="grand_total" value="{{$tx->grand_total}}">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <div class="form-group">
                                     <button type="button" id="btn-cash" class="btn btn-light mr-2 w-100">Cash</button>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <div class="form-group">
                                     <button type="button" id="btn-transfer" class="btn btn-light mr-2 w-100">Transfer</button>
                                     </div>
@@ -294,7 +344,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-8 grid-margin stretch-card">
+        <div class="col-md-9 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Items</h4>
@@ -306,10 +356,11 @@
                                         <tr>
                                             <th>#</th>
                                             <th width="40%">Name</th>
-                                            <th style="min-width:105px">Qty</th>
-                                            <th style="min-width:90px">Disc(%)</th>
+                                            <th style="min-width:90px">Qty</th>
                                             <th>Unit</th>
-                                            <th>Sub Total</th>
+                                            <th style="min-width:130px">Price</th>
+                                            <th>Discount</th>
+                                            <th style="min-width:130px">Sub Total</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -319,7 +370,6 @@
                                             <td class="cart-no">{{$key+1}}</td>
                                             <td>
                                                 <input value="{{$detail->goods_id}}" type="hidden" name="goods_id[]" class="cart-goods-id" />
-                                                <input value="{{$detail->price}}" type="hidden" name="price[]" class="cart-price" />
                                                 <input value="{{$detail->unit_id}}" type="hidden" name="unit_id[]" class="cart-unit-id" />
                                                 <input value="{{$detail->sub_total}}" type="hidden" name="sub_total[]" class="cart-sub-total-input" />
                                                 <select class="cart-goods select-goods form-control" style="width:100% !important" required>
@@ -330,9 +380,15 @@
                                                 </select>
                                             </td>
                                             <td><input type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value="{{$detail->qty}}" required autofocus></td>
-                                            <td><input type="text" class="cart-disc form-control" name="disc[]" placeholder="Disc" value="{{$detail->disc}}" autofocus></td>
                                             <td class="cart-unit">{{$detail->unit->name}}</td>
-                                            <td data-val="{{$detail->sub_total}}" class="cart-sub-total text-right">{{$tx->showCurrency($detail->sub_total)}}</td>
+                                            <td><input value="{{$detail->price}}" type="text" class="cart-price form-control" name="price[]" /></td>
+                                            <td>
+                                                <div style="display: block">%
+                                                <input value="{{$detail->disc}}" style="display: inline-block; width: 60px !important" type="text" class="cart-disc form-control" name="disc[]" placeholder="Disc" value="" autofocus>
+                                                Rp<input value="{{($detail->price * $detail->qty) * ($detail->disc/100)}}" style="display: inline-block; width: 100px !important" type="text" class="cart-disc-price form-control" />
+                                                </div>
+                                            </td>
+                                            <td class="cart-sub-total text-right">{{$tx->showCurrency($detail->sub_total)}}</td>
                                             <td>
                                                 <button type="button" class="btn-dlt-cart btn btn-danger btn-icon" data-title="Delete Goods" data-text="Are you sure you want to delete this data?">
                                                     <i data-feather="trash"></i>
@@ -344,23 +400,23 @@
                                     <tfoot>
                                         
                                         <tr>
-                                            <td colspan=6>           
+                                            <td colspan=7>           
                                                 <button id="btn-add-goods" type="button" class="btn btn-primary btn-icon w-100" data-title="Delete Goods" data-text="Are you sure you want to delete this data?">
                                                     <i data-feather="plus"></i>ADD ITEM
                                                 </button>
                                             </td>
                                         </tr>
 
-                                        <tr>
+                                        <!-- <tr>
                                             <td colspan=5 class="text-right">Total:</td>
                                             <td class="cart-total text-right">{{$tx->showCurrency($tx->total)}}</td>
-                                        </tr>
+                                        </tr> -->
                                         <tr>
-                                            <td colspan=5 class="text-right">Tax (10%):</td>
+                                            <td colspan=6 class="text-right">Tax (10%):</td>
                                             <td class="cart-tax text-right">{{$tx->showCurrency($tx->tax)}}</td>
                                         </tr>
                                         <tr>
-                                            <td colspan=5 class="text-right">Grand Total:</td>
+                                            <td colspan=6 class="text-right">Grand Total:</td>
                                             <td class="cart-grand-total text-right">{{$tx->showCurrency($tx->grand_total)}}</td>
                                         </tr>
                                     </tfoot>
