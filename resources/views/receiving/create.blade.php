@@ -246,9 +246,9 @@
                         </div>
                         <div class="col-md-6 col-6">
                             <div class="flt-right" style="float: right">
-                                <button id="btn-new-goods" class="btn btn-success btn-icon-text btn-edit-profile">
+                                <a href="javascript:void(0)" id="btn-new-goods" class="btn btn-success btn-icon-text btn-edit-profile">
                                     <i data-feather="plus" class="btn-icon-prepend"></i> Create Goods
-                                </button>
+                                </a>
                             </div>  
                         </div>
                         <div class="col-md-12">
