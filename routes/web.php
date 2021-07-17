@@ -23,12 +23,12 @@ Route::get('/home', 'HomeController@index')->name('home');
 ========== MASTER DATA ==========
 =================================
 */
-Route::group(['prefix' => 'client'], function()
+Route::group(['prefix' => 'customer'], function()
 {
-    Route::get('/', 'ClientController@index')->name('client.index');
-    Route::post('/store', 'ClientController@store')->name('client.store');
-    Route::post('/update/{client}', 'ClientController@update')->name('client.update');
-    Route::post('/delete/{client}', 'ClientController@destroy')->name('client.delete');
+    Route::get('/', 'CustomerController@index')->name('customer.index');
+    Route::post('/store', 'CustomerController@store')->name('customer.store');
+    Route::post('/update/{customer}', 'CustomerController@update')->name('customer.update');
+    Route::post('/delete/{customer}', 'CustomerController@destroy')->name('customer.delete');
 }); 
 
 Route::group(['prefix' => 'employee'], function()
@@ -37,14 +37,6 @@ Route::group(['prefix' => 'employee'], function()
     Route::post('/store', 'EmployeeController@store')->name('employee.store');
     Route::post('/update/{employee}', 'EmployeeController@update')->name('employee.update');
     Route::post('/delete/{employee}', 'EmployeeController@destroy')->name('employee.delete');
-}); 
-
-Route::group(['prefix' => 'company'], function()
-{
-    Route::get('/', 'CompanyController@index')->name('company.index');
-    Route::post('/store', 'CompanyController@store')->name('company.store');
-    Route::post('/update/{company}', 'CompanyController@update')->name('company.update');
-    Route::post('/delete/{company}', 'CompanyController@destroy')->name('company.delete');
 }); 
 
 Route::group(['prefix' => 'seller'], function()

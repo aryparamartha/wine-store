@@ -73,7 +73,7 @@ class RegularTx extends Model
 
     public function customer()
     {
-        return $this->belongsTo('App\Company', 'customer_id');
+        return $this->belongsTo('App\Customer', 'customer_id');
     }
     
     public function detail()

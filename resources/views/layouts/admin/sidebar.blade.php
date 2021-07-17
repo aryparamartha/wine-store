@@ -18,32 +18,6 @@
                 </a>
             </li>
 
-            <li class="nav-item nav-category">Master Data</li>
-            <li class="nav-item">
-                <a href="{{route('client.index')}}" class="nav-link">
-                    <i class="link-icon" data-feather="users"></i>
-                    <span class="link-title">Clients</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{route('employee.index')}}" class="nav-link">
-                    <i class="link-icon" data-feather="user"></i>
-                    <span class="link-title">Employees</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{route('company.index')}}" class="nav-link">
-                    <i class="link-icon" data-feather="briefcase"></i>
-                    <span class="link-title">Companies</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{route('seller.index')}}" class="nav-link">
-                    <i class="link-icon" data-feather="share-2"></i>
-                    <span class="link-title">Sellers</span>
-                </a>
-            </li>
-
             <li class="nav-item nav-category">Transactions</li>
             <li class="nav-item">
                 <a href="{{route('tx.regular.index')}}" class="nav-link">
@@ -87,6 +61,26 @@
                 <a href="{{route('supplier.index')}}" class="nav-link">
                     <i class="link-icon" data-feather="truck"></i>
                     <span class="link-title">Suppliers</span>
+                </a>
+            </li>
+            
+            <li class="nav-item nav-category">Master Data</li>
+            <li class="nav-item">
+                <a href="{{route('customer.index')}}" class="nav-link">
+                    <i class="link-icon" data-feather="users"></i>
+                    <span class="link-title">Customer</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{route('employee.index')}}" class="nav-link">
+                    <i class="link-icon" data-feather="user"></i>
+                    <span class="link-title">Employees</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{route('seller.index')}}" class="nav-link">
+                    <i class="link-icon" data-feather="share-2"></i>
+                    <span class="link-title">Sellers</span>
                 </a>
             </li>
         </ul>

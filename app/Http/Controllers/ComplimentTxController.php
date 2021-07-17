@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Client;
+use App\Customer;
 use App\CompanyProfile;
 use App\DetComplTx;
 use App\Goods;
@@ -32,7 +32,7 @@ class ComplimentTxController extends Controller
 
     public function create(){
         $goods = Goods::with('unit')->get();
-        $customers = Client::get();
+        $customers = Customer::get();
         $sellers = Seller::get();
         return view('transaction.compliment.create', compact('goods', 'customers', 'sellers'));
     }
@@ -108,7 +108,7 @@ class ComplimentTxController extends Controller
     public function draft(ComplimentTx $tx){
         $details = DetComplTx::with('goods','unit')->where('compliment_tx_id', '=', $tx->id)->get();
         $goods = Goods::with('unit')->get();
-        $customers = Client::get();
+        $customers = Customer::get();
         $sellers = Seller::get();
         return view('transaction.compliment.draft', compact('tx', 'details', 'goods', 'customers', 'sellers'));
     }

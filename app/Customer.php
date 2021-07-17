@@ -4,14 +4,16 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Company extends Model
+class Customer extends Model
 {
     protected $fillable = [
         'name',
-        'address', 
-        'number', 
-        'email', 
-        'pic', 
+        'address',
+        'number',
+        'email',
+        'pic',
+        'type',
+        'note',
     ];
 
     public function employee()

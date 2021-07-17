@@ -124,16 +124,17 @@
                             @endforeach
                         </tbody>
                         <tfoot>
+                            <?php $colspan = (isset($item->disc))? 6 : 5; ?>
                             <tr>
-                                <td colspan=6 class="text-right">Total :</td>
+                                <td colspan={{$colspan}} class="text-right">Total :</td>
                                 <td class="cart-total text-right">{{ $tx->showCurrency($tx->total) }}</td>
                             </tr>
                             <tr>
-                                <td colspan=6 class="text-right">Tax (10%) :</td>
+                                <td colspan={{$colspan}} class="text-right">Tax (10%) :</td>
                                 <td class="cart-tax text-right">{{ $tx->showCurrency($tx->tax) }}</td>
                             </tr>
                             <tr>
-                                <td colspan=6 class="text-right"><b>Grand Total :</b></td>
+                                <td colspan={{$colspan}} class="text-right"><b>Grand Total :</b></td>
                                 <td class="cart-grand-total text-right"><b>{{ $tx->showCurrency($tx->grand_total) }}</b></td>
                             </tr>
                         </tfoot>

@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'WineryApp - Clients')
+@section('title', 'WineryApp - Customers')
 
 @section('plugin-css')
 <link rel="stylesheet" href="{{asset('assets/vendors/datatables.net-bs4/dataTables.bootstrap4.css')}}">
@@ -42,29 +42,29 @@
             $(".select2").select2({placeholder: "Select PIC"});
         }
 
-        var clients = {!! $clients !!}
-        $('#btn-add-client').click(function () {
+        var customers = {!! $customers !!}
+        $('#btn-add-customer').click(function () {
             $('#name').val("");
             $('#address').val("");
             $('#number').val("");
             $('#email').val("");
             $('#pic').val("").trigger('change');
-            $('#client-form').attr('action', "{{route('client.store')}}");
-            $('#client-modal-title').html("Add Client");
-            $('#client-modal').modal('show');
+            $('#customer-form').attr('action', "{{route('customer.store')}}");
+            $('#customer-modal-title').html("Add Customer");
+            $('#customer-modal').modal('show');
         });
 
-        $('.btn-edit-client').click(function() {
+        $('.btn-edit-customer').click(function() {
             var index = $(this).data('index');
-            var client = clients[index]
-            $('#client-form').attr('action', '/client/update/' + client.id);
-            $('#client-modal-title').html("Update Client");
-            $('#client-modal').modal('show');
-            $('#name').val(client.name);
-            $('#address').val(client.address);
-            $('#number').val(client.number);
-            $('#email').val(client.email);
-            $('#pic').val(client.pic).trigger('change');
+            var customer = customers[index]
+            $('#customer-form').attr('action', '/customer/update/' + customer.id);
+            $('#customer-modal-title').html("Update Customer");
+            $('#customer-modal').modal('show');
+            $('#name').val(customer.name);
+            $('#address').val(customer.address);
+            $('#number').val(customer.number);
+            $('#email').val(customer.email);
+            $('#pic').val(customer.pic).trigger('change');
         });
 
         $(".btn-dlt-alert").click(function(event){
@@ -113,12 +113,12 @@
                 <div class="card-body">
                     <div class="row mb-20">
                         <div class="col-md-6 col-6">
-                            <h6 class="card-title">Client Data</h6>
+                            <h6 class="card-title">Customer Data</h6>
                         </div>
                         <div class="col-md-6 col-6">
                             <div class="flt-right">
-                                <a class="btn btn-success btn-icon-text btn-edit-profile" href="javascript:void(0)" id="btn-add-client" >
-                                    <i data-feather="plus" class="btn-icon-prepend"></i> Add Client
+                                <a class="btn btn-success btn-icon-text btn-edit-profile" href="javascript:void(0)" id="btn-add-customer" >
+                                    <i data-feather="plus" class="btn-icon-prepend"></i> Add Customer
                                 </a>
                             </div>  
                         </div>
@@ -133,25 +133,29 @@
                                     <th>Number</th>
                                     <th>Email</th>
                                     <th>PIC</th>
+                                    <th>Type</th>
+                                    <th>Note</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($clients as $key => $client) 
+                                @foreach($customers as $key => $customer) 
                                 <tr>
                                     <td>{{$key+1}}</td>
-                                    <td>{{ $client->name }}</td>
-                                    <td>{{ $client->address }}</td>
-                                    <td>{{ $client->number }}</td>
-                                    <td>{{ $client->email }}</td>
-                                    <td>{{ $client->employee->name }}</td>
+                                    <td>{{ $customer->name }}</td>
+                                    <td>{{ $customer->address }}</td>
+                                    <td>{{ $customer->number }}</td>
+                                    <td>{{ $customer->email }}</td>
+                                    <td>{{ $customer->employee->name }}</td>
+                                    <td>{{ $customer->type }}</td>
+                                    <td>{{ $customer->note }}</td>
                                     <td>
-                                        <button data-index="{{$key}}" class="btn-edit-client btn btn-primary btn-icon">
+                                        <button data-index="{{$key}}" class="btn-edit-customer btn btn-primary btn-icon">
                                             <i data-feather="edit"></i>
                                         </button>
-                                        <form class="frm-dlt-alert" action="{{route('client.delete', $client)}}" method="post" style="display: inline-block;">
+                                        <form class="frm-dlt-alert" action="{{route('customer.delete', $customer)}}" method="post" style="display: inline-block;">
                                             @csrf
-                                            <button type="button" class="btn-dlt-alert btn btn-danger btn-icon" data-title="Delete Client" data-text="Are you sure you want to delete this data?">
+                                            <button type="button" class="btn-dlt-alert btn btn-danger btn-icon" data-title="Delete Customer" data-text="Are you sure you want to delete this data?">
                                                 <i data-feather="trash"></i>
                                             </button>
                                         </form> 
@@ -168,13 +172,13 @@
 </div>
 
 {{-- Modal --}}
-<div class="modal fade" id="client-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="customer-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">        
-        <form id="client-form" class="forms-sample" action="" method="POST">
+        <form id="customer-form" class="forms-sample" action="" method="POST">
             @csrf
             <div class="modal-header">
-                <h5 class="modal-title" id="client-modal-title"></h5>
+                <h5 class="modal-title" id="customer-modal-title"></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -182,7 +186,7 @@
             <div class="modal-body">
                 <input type="hidden" name="id" id="id">
                 <div class="form-group">
-                    <label for="name">Client Name</label>
+                    <label for="name">Customer Name</label>
                     <input type="text" class="form-control" id="name" name="name" required autofocus>                     
                 </div>      
                 <div class="form-group">
@@ -206,6 +210,17 @@
                         @endforeach
                     </select>                    
                 </div>  
+                <div class="form-group">
+                    <label for="type" class="w-100">Type</label>
+                    <select id="type" name="type" class="select2 form-control" required>
+                        <option value="company">company</option>
+                        <option value="person">person</option>
+                    </select>                    
+                </div>  
+                <div class="form-group">
+                    <label for="note">Note</label>
+                    <input type="text" class="form-control" id="note" name="note" required autofocus>                     
+                </div>    
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

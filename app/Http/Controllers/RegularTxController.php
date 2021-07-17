@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Company;
+use App\Customer;
 use App\CompanyProfile;
 use App\DetRegTx;
 use App\Goods;
@@ -33,7 +33,7 @@ class RegularTxController extends Controller
 
     public function create(){
         $goods = Goods::with('unit')->get();
-        $customers = Company::get();
+        $customers = Customer::get();
         $sellers = Seller::get();
         return view('transaction.regular.create', compact('goods', 'customers', 'sellers'));
     }
@@ -109,7 +109,7 @@ class RegularTxController extends Controller
     public function draft(RegularTx $tx){
         $details = DetRegTx::with('goods','unit')->where('regular_tx_id', '=', $tx->id)->get();
         $goods = Goods::with('unit')->get();
-        $customers = Company::get();
+        $customers = Customer::get();
         $sellers = Seller::get();
         return view('transaction.regular.draft', compact('tx', 'details', 'goods', 'customers', 'sellers'));
     }

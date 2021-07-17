@@ -20,6 +20,7 @@ class GoodsController extends Controller
     public function insert(Request $request)
     {
         $input = $request->all();
+        $input["tax_price"] = bcdiv(10/11 * $input["selling_price"], 1, 2) + 0.01;
         $goods = Goods::create($input);
         return $goods;
     }

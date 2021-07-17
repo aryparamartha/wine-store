@@ -13,6 +13,7 @@ class Goods extends Model
         'amount',
         'purchase_price',
         'selling_price',
+        'tax_price',
         'added_by',
     ];
 
