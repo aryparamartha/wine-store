@@ -120,10 +120,13 @@
                                     <td class="text-right">{{ $receiving->showCurrency($receiving->grand_total) }}</td>
                                     <td>{{ $receiving->employee->name }}</td>
                                     <td>{{ $receiving->localTz($receiving->created_at) }}</td>
-                                    <td>{{ $receiving->localTz($receiving->receiving_date) }}</td>
+                                    <td>{{ $receiving->localTz($receiving->receiving_date, "Y-m-d") }}</td>
                                     <td>
                                         <a href="{{route('receiving.invoice', $receiving)}}" target="_blank" class="btn btn-light btn-icon">
                                             <i data-feather="printer"></i>
+                                        </a>
+                                        <a href="{{route('receiving.edit', $receiving)}}" class="btn btn-primary btn-icon">
+                                            <i data-feather="edit"></i>
                                         </a>
                                         <form class="frm-dlt-alert" action="{{route('receiving.delete', $receiving)}}" method="post" style="display: inline-block;">
                                             @csrf

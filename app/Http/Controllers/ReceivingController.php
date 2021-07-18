@@ -80,7 +80,63 @@ class ReceivingController extends Controller
             die($e);
             $notif = [
                 "type" => "failed",
-                "message" => "Failed to create receiving transaction!"
+                "message" => "Failed to create receiving!"
+            ];
+        }
+
+        return redirect()->route('receiving.index')->with($notif['type'], $notif['message']);
+    }
+
+    public function edit(Receiving $receiving){
+        $details = DetReceiving::with('goods','unit')->where('receiving_id', '=', $receiving->id)->get();
+        $goods = Goods::with('unit')->get();
+        $suppliers = Supplier::get();
+        $units = Unit::get();
+        return view('receiving.edit', compact('receiving', 'details', 'goods', 'suppliers', 'units'));
+    }
+
+    public function update(Request $request, Receiving $receiving)
+    {
+        $notif = [];
+        $input = $request->all();
+        
+        $receiving->invoice_id = $input['invoice_id'];
+        $receiving->employee_id = Auth::user()->id;
+        $receiving->supplier_id = $input['supplier_id'];
+        $receiving->grand_total = $input['grand_total'];
+        $receiving->receiving_date = $input['receiving_date'];
+
+        $receiving_details = [];
+        foreach($input['goods_id'] as $key => $goods_id){
+            $detail = new DetReceiving;
+            $detail->goods_id = $goods_id;
+            $detail->qty = $input['qty'][$key];
+            $detail->unit_id = $input['unit_id'][$key];
+            $detail->price = $input['price'][$key];
+            $detail->sub_total = $input['sub_total'][$key];
+            $receiving_details[] = $detail;
+        }
+        try{
+            DB::beginTransaction();
+
+            $receiving->save();
+            DetReceiving::where('receiving_id', $receiving->id)->delete();
+
+            foreach($receiving_details as $detail) {
+                $detail->receiving_id = $receiving->id;
+                $detail->save();
+            }
+            DB::commit();
+            $notif = [
+                "type" => "success",
+                "message" => "Receiving has been updated!"
+            ];
+        }catch(\Exception $e){
+            DB::rollback();
+            die($e);
+            $notif = [
+                "type" => "failed",
+                "message" => "Failed to updated receiving!"
             ];
         }
 

@@ -20,10 +20,10 @@ class Receiving extends Model
         return "Rp".number_format($n, 0, "", ".");
     }
 
-    public function localTz($carbon){
+    public function localTz($carbon, $format="Y-m-d H:i:s"){
         if($carbon==null || $carbon=="") return "";
-        $time = Carbon::createFromFormat('Y-m-d H:i:s', $carbon, config('app.timezone'));
-        return $time->setTimezone(config('app.local_timezone'));
+        $time = Carbon::createFromFormat($format, $carbon, config('app.timezone'));
+        return $time->setTimezone(config('app.local_timezone'))->format($format);
     }
 
     public function employee()
