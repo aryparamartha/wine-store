@@ -111,7 +111,7 @@ class ComplimentTxController extends Controller
             DB::commit();
             $notif = [
                 "type" => "success",
-                "message" => "Compliment transaction has been created!"
+                "message" => "Surat Jalan has been created!"
             ];
         }catch(\Exception $e){
             DB::rollback();
@@ -120,7 +120,7 @@ class ComplimentTxController extends Controller
             }
             $notif = [
                 "type" => "failed",
-                "message" => "Failed to create compliment transaction!"
+                "message" => "Failed to create Surat Jalan transaction!"
             ];
         }
 
@@ -206,7 +206,7 @@ class ComplimentTxController extends Controller
             DB::commit();
             $notif = [
                 "type" => "success",
-                "message" => "Compliment transaction has been updated!"
+                "message" => "Surat Jalan has been updated!"
             ];
         }catch(\Exception $e){
             DB::rollback();
@@ -215,7 +215,7 @@ class ComplimentTxController extends Controller
             }
             $notif = [
                 "type" => "failed",
-                "message" => "Failed to update compliment transaction!"
+                "message" => "Failed to update Surat Jalan!"
             ];
         }
 

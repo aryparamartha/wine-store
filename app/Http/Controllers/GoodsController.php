@@ -48,7 +48,7 @@ class GoodsController extends Controller
     public function storeAPI(Request $request){
         $goods = $this->insert($request);
         $response['status'] = 200;
-        $response['message'] = "Success insert goods";
+        $response['message'] = "Success insert product";
         $response['data'] = Goods::where("id", $goods->id)->with('unit')->first();
 
         return response()->json($response, 200);
@@ -57,7 +57,7 @@ class GoodsController extends Controller
     public function store(Request $request)
     { 
         $this->insert($request);
-        return redirect()->route('goods.index')->with('success', 'New goods has been saved!');
+        return redirect()->route('goods.index')->with('success', 'New product has been saved!');
     }
 
     public function edit(Goods $goods){
@@ -68,12 +68,12 @@ class GoodsController extends Controller
     {
         $input = $request->all();
         $goods->update($input);
-        return redirect()->route('goods.index')->with('success', 'Goods data has been updated!');
+        return redirect()->route('goods.index')->with('success', 'Product data has been updated!');
     }
 
     public function destroy(Goods $goods)
     {
         $goods->delete();
-        return redirect()->route('goods.index')->with('success', 'Goods data has been deleted!');
+        return redirect()->route('goods.index')->with('success', 'Product data has been deleted!');
     }
 }

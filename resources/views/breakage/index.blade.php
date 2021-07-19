@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'WineryApp - Breakages')
+@section('title', 'WineryApp - Update Stock')
 
 @section('plugin-css')
 <link rel="stylesheet" href="{{asset('assets/vendors/datatables.net-bs4/dataTables.bootstrap4.css')}}">
@@ -39,7 +39,7 @@
 <script>
     $(document).ready(function () {
         if ($(".select2").length) {
-            $(".select2").select2({placeholder: "Select Goods"});
+            $(".select2").select2({placeholder: "Select Product"});
         }
 
         var breakages = {!! $breakages !!}
@@ -49,7 +49,7 @@
             $('#qty').val("");
             $('#reason').val("");
             $('#breakage-form').attr('action', "{{route('breakage.store')}}");
-            $('#breakage-modal-title').html("Add Breakage");
+            $('#breakage-modal-title').html("Add Stock Adjustment");
             $('#breakage-modal').modal('show');
         });
 
@@ -57,7 +57,7 @@
             var index = $(this).data('index');
             var breakage = breakages[index]
             $('#breakage-form').attr('action', '/breakage/update/' + breakage.id);
-            $('#breakage-modal-title').html("Update Breakage");
+            $('#breakage-modal-title').html("Update Stock Adjustment");
             $('#breakage-modal').modal('show');
             $('#id').val(breakage.id);
             $('#goods_id').val(breakage.goods_id).trigger('change');
@@ -111,12 +111,12 @@
                 <div class="card-body">
                     <div class="row mb-20">
                         <div class="col-md-6 col-6">
-                            <h6 class="card-title">Breakage Data</h6>
+                            <h6 class="card-title">Stock Adjustment Data</h6>
                         </div>
                         <div class="col-md-6 col-6">
                             <div class="flt-right">
                                 <a class="btn btn-success btn-icon-text btn-edit-profile" href="javascript:void(0)" id="btn-add-breakage" >
-                                    <i data-feather="plus" class="btn-icon-prepend"></i> Add Breakage
+                                    <i data-feather="plus" class="btn-icon-prepend"></i> Add Adjustment
                                 </a>
                             </div>  
                         </div>
@@ -126,7 +126,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Goods</th>
+                                    <th>Product</th>
                                     <th>Qty</th>
                                     <th>Created by</th>
                                     <th>Date</th>
@@ -149,7 +149,7 @@
                                         </button>
                                         <form class="frm-dlt-alert" action="{{route('breakage.delete', $breakage)}}" method="post" style="display: inline-block;">
                                             @csrf
-                                            <button type="button" class="btn-dlt-alert btn btn-danger btn-icon" data-title="Delete Breakage" data-text="Are you sure you want to delete this data?">
+                                            <button type="button" class="btn-dlt-alert btn btn-danger btn-icon" data-title="Delete Adjustment" data-text="Are you sure you want to delete this data?">
                                                 <i data-feather="trash"></i>
                                             </button>
                                         </form> 
@@ -180,7 +180,7 @@
             <div class="modal-body">
                 <input type="hidden" name="id" id="id">
                 <div class="form-group">
-                    <label for="goods_id" class="w-100">Goods</label>
+                    <label for="goods_id" class="w-100">Product</label>
                     <select id="goods_id" name="goods_id" class="select2 form-control" required>
                         <option></option>
                         @foreach($goods as $good)

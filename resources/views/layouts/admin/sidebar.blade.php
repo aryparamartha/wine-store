@@ -28,7 +28,7 @@
             <li class="nav-item">
                 <a href="{{route('tx.compliment.index')}}" class="nav-link">
                     <i class="link-icon" data-feather="percent"></i>
-                    <span class="link-title">Compliment</span>
+                    <span class="link-title">Surat Jalan</span>
                 </a>
             </li>
 
@@ -42,7 +42,7 @@
             <li class="nav-item">
                 <a href="{{route('goods.index')}}" class="nav-link">
                     <i class="link-icon" data-feather="package"></i>
-                    <span class="link-title">Goods</span>
+                    <span class="link-title">Products</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -54,7 +54,7 @@
             <li class="nav-item">
                 <a href="{{route('breakage.index')}}" class="nav-link">
                     <i class="link-icon" data-feather="trash-2"></i>
-                    <span class="link-title">Breakages</span>
+                    <span class="link-title">Update Stock</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -68,7 +68,7 @@
             <li class="nav-item">
                 <a href="{{route('customer.index')}}" class="nav-link">
                     <i class="link-icon" data-feather="users"></i>
-                    <span class="link-title">Customer</span>
+                    <span class="link-title">Customers</span>
                 </a>
             </li>
             <li class="nav-item">

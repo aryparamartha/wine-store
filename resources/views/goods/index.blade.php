@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'WineryApp - Goods')
+@section('title', 'WineryApp - Product')
 
 @section('plugin-css')
 <link rel="stylesheet" href="{{asset('assets/vendors/datatables.net-bs4/dataTables.bootstrap4.css')}}">
@@ -51,7 +51,7 @@
             $('#purchase_price').val("");
             $('#selling_price').val("");
             $('#goods-form').attr('action', "{{route('goods.store')}}");
-            $('#goods-modal-title').html("Add Goods");
+            $('#goods-modal-title').html("Add Product");
             $('#goods-modal').modal('show');
         });
 
@@ -59,7 +59,7 @@
             var index = $(this).data('index');
             var good = goods[index]
             $('#goods-form').attr('action', '/goods/update/' + good.id);
-            $('#goods-modal-title').html("Update Goods");
+            $('#goods-modal-title').html("Update Product");
             $('#goods-modal').modal('show');
             $('#code').val(good.code);
             $('#name').val(good.name);
@@ -115,12 +115,12 @@
                 <div class="card-body">
                     <div class="row mb-20">
                         <div class="col-md-6 col-6">
-                            <h6 class="card-title">Goods Data</h6>
+                            <h6 class="card-title">Product Data</h6>
                         </div>
                         <div class="col-md-6 col-6">
                             <div class="flt-right">
                                 <a class="btn btn-success btn-icon-text btn-edit-profile" href="javascript:void(0)" id="btn-add-goods" >
-                                    <i data-feather="plus" class="btn-icon-prepend"></i> Add Goods
+                                    <i data-feather="plus" class="btn-icon-prepend"></i> Add Product
                                 </a>
                             </div>  
                         </div>
@@ -157,7 +157,7 @@
                                         </button>
                                         <form class="frm-dlt-alert" action="{{route('goods.delete', $good)}}" method="post" style="display: inline-block;">
                                             @csrf
-                                            <button type="button" class="btn-dlt-alert btn btn-danger btn-icon" data-title="Delete Goods" data-text="Are you sure you want to delete this data?">
+                                            <button type="button" class="btn-dlt-alert btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
                                                 <i data-feather="trash"></i>
                                             </button>
                                         </form> 

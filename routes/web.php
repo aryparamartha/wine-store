@@ -82,7 +82,7 @@ Route::group(['prefix' => 'transaction'], function()
         Route::get('/invoice/{tx}', 'RegularTxController@invoice')->name('tx.regular.invoice');
     }); 
 
-    Route::group(['prefix' => 'compliment'], function()
+    Route::group(['prefix' => 'surat-jalan'], function()
     {
         Route::get('/', 'ComplimentTxController@index')->name('tx.compliment.index');
         Route::get('/new', 'ComplimentTxController@create')->name('tx.compliment.new');
@@ -106,7 +106,7 @@ Route::group(['prefix' => 'unit'], function()
     Route::post('/delete/{unit}', 'UnitController@destroy')->name('unit.delete');
 });
 
-Route::group(['prefix' => 'goods'], function()
+Route::group(['prefix' => 'product'], function()
 {
     Route::get('/', 'GoodsController@index')->name('goods.index');
     Route::post('/store', 'GoodsController@store')->name('goods.store');

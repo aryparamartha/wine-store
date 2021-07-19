@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'WineryApp - Compliment Transaction')
+@section('title', 'WineryApp - Surat Jalan')
 
 @section('plugin-css')
 <link rel="stylesheet" href="{{asset('assets/vendors/datatables.net-bs4/dataTables.bootstrap4.css')}}">
@@ -59,12 +59,12 @@
                 <div class="card-body">
                     <div class="row mb-20">
                         <div class="col-md-6 col-6">
-                            <h6 class="card-title">Compliment Transaction Data</h6>
+                            <h6 class="card-title">Surat Jalan Data</h6>
                         </div>
                         <div class="col-md-6 col-6">
                             <div class="flt-right">
                                 <a class="btn btn-success btn-icon-text btn-edit-profile" href="{{route('tx.compliment.new')}}" id="btn-add-breakage" >
-                                    <i data-feather="plus" class="btn-icon-prepend"></i> Add Compliment Transaction
+                                    <i data-feather="plus" class="btn-icon-prepend"></i> Add Surat Jalan
                                 </a>
                             </div>  
                         </div>
