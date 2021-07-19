@@ -194,8 +194,8 @@
             $(".cart-sub-total-input").each(function( index ) {
                 total+= parseInt($(this).val());
             });
-            let tax = 1/11 * total;
-            let grand_total = total;
+            let tax = 0.1 * total;
+            let grand_total = total + tax;
             
             $("#total").val(total);
             $("#tax").val(tax.toFixed(2));
@@ -405,10 +405,10 @@
                                             </td>
                                         </tr>
 
-                                        <!-- <tr>
+                                        <tr>
                                             <td colspan=6 class="text-right">Total:</td>
                                             <td class="cart-total text-right">-</td>
-                                        </tr> -->
+                                        </tr>
                                         <tr>
                                             <td colspan=6 class="text-right">Tax (10%):</td>
                                             <td class="cart-tax text-right">-</td>

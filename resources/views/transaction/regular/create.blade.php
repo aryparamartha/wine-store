@@ -94,7 +94,6 @@
         $("#goods-cart").on('click', '.btn-dlt-cart', delete_cart)
 
         function change_qty(){
-            console.log(1)
             let index = $(this).index(".cart-qty"); 
             let price = JSON.parse($(".cart-price").eq(index).val());
             let qty = $(this).val();
@@ -134,8 +133,8 @@
             $(".cart-sub-total").each(function( index ) {
                 total+= parseInt($(this).data("val"));
             });
-            let tax = 1/11 * total;
-            let grand_total = total;
+            let tax = 0.1 * total;
+            let grand_total = total + tax;
             
             $("#total").val(total);
             $("#tax").val(tax.toFixed(2));
@@ -337,10 +336,10 @@
                                             </td>
                                         </tr>
 
-                                        <!-- <tr>
+                                        <tr>
                                             <td colspan=4 class="text-right">Total:</td>
                                             <td class="cart-total text-right">-</td>
-                                        </tr> -->
+                                        </tr>
                                         <tr>
                                             <td colspan=4 class="text-right">Tax (10%):</td>
                                             <td class="cart-tax text-right">-</td>

@@ -133,8 +133,8 @@
             $(".cart-sub-total").each(function( index ) {
                 total+= parseInt($(this).data("val"));
             });
-            let tax = 1/11 * total;
-            let grand_total = total;
+            let tax = 0.1 * total;
+            let grand_total = total + tax;
             
             $("#total").val(total);
             $("#tax").val(tax.toFixed(2));
