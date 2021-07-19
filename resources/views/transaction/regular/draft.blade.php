@@ -22,164 +22,53 @@
 
 @section('custom-js')
 <script src="{{asset('assets/js/data-table.js')}}"></script>
+<script src="{{asset('assets/js/custom/tx.js')}}"></script>
 <script>
-    $(document).ready(function () {
-        $("#customer_id").select2({placeholder: "Select Customer"});
-        $("#seller_id").select2({placeholder: "Select Seller"});
-        $(".select-goods").select2({placeholder: "Select Product"});
-    });
-</script>
-<script>
-    const truncateByDecimalPlace = (value, numDecimalPlaces) => Math.trunc(value * Math.pow(10, numDecimalPlaces)) / Math.pow(10, numDecimalPlaces)
-    function numberWithCommas(x) {
-        var parts = x.toString().replace(".",",").split(",");
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        if(typeof parts[1] == 'undefined') parts[1] = "00";
-        return parts.join(",");
-    }
-
-    function showCurrency(x){
-        return "Rp" + numberWithCommas(x);
-    }
-     $(document).ready(function () {
-        @if (\Session::has('success'))  
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 5000
-            });
-            
-            Toast.fire({
-                type: 'success',
-                title: "{{ \Session::get('success') }}"
-            });
-        @endif   
-
-        var total = 0;
-
-        $("#btn-add-goods").click(function(){
-            let template = `
-            <tr>
-                <td class="cart-no">1</td>
-                <td>
-                    <input type="hidden" name="goods_id[]" class="cart-goods-id" />
-                    <input type="hidden" name="price[]" class="cart-price" />
-                    <input type="hidden" name="unit_id[]" class="cart-unit-id" />
-                    <input type="hidden" name="sub_total[]" class="cart-sub-total-input" />
-                    <select class="cart-goods select-goods form-control" style="width:100% !important" required>
-                        <option></option>
-                        @foreach($goods as $good)
-                        <option value="{{$good}}">{{$good->code}} - {{$good->name}}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td><input type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value="" required autofocus></td>
-                <td class="cart-unit"></td>
-                <td class="cart-sub-total text-right"></td>
-                <td>
-                    <button type="button" class="btn-dlt-cart btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                    </button>
-                </td>
-            </tr>
-            `;
-            $("#goods-cart").append(template);
-            $(".select-goods").select2({placeholder: "Select Product"});
-
-            render_cart_number();
+    @if (\Session::has('success'))  
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 5000
         });
-        $("#goods-cart").on('change', '.select-goods', change_selected_goods)
-        $("#goods-cart").on('change', '.cart-qty', change_qty)
-        $("#goods-cart").on('click', '.btn-dlt-cart', delete_cart)
-
-        function change_qty(){
-            let index = $(this).index(".cart-qty"); 
-            let price = JSON.parse($(".cart-price").eq(index).val());
-            let qty = $(this).val();
-            let sub_total = price * qty;
-
-            $(".cart-sub-total").eq(index).html(showCurrency(sub_total))
-            $(".cart-sub-total").eq(index).data("val", sub_total)
-            $(".cart-sub-total-input").eq(index).val(sub_total)
-            calculate_total();
-        }
-
-        function change_selected_goods(){
-            let index = $(this).index(".select-goods"); 
-            let goods = JSON.parse($(this).val());
-            let qty = $(".cart-qty").eq(index).val()
-            let sub_total = goods.selling_price * qty;
-
-            $(".cart-goods-id").eq(index).val(goods.id)
-            $(".cart-price").eq(index).val(goods.selling_price)
-            $(".cart-unit-id").eq(index).val(goods.unit.id)
-            $(".cart-unit").eq(index).html(goods.unit.name)
-            $(".cart-sub-total").eq(index).html(showCurrency(sub_total))
-            $(".cart-sub-total").eq(index).data("val", sub_total)
-            $(".cart-sub-total-input").eq(index).val(sub_total)
-            calculate_total();
-        }
-
-        function delete_cart(){
-            let index = $(this).index(".btn-dlt-cart"); 
-            $("#goods-cart > tr").eq(index).remove();
-            render_cart_number();
-            calculate_total();
-        }
-
-        function calculate_total(){
-            let total = 0;
-            $(".cart-sub-total").each(function( index ) {
-                total+= parseInt($(this).data("val"));
-            });
-            let tax = 0.1 * total;
-            let grand_total = total + tax;
-            
-            $("#total").val(total);
-            $("#tax").val(tax.toFixed(2));
-            $("#grand_total").val(grand_total);
-
-            $(".cart-total").html(showCurrency(total));
-            $(".cart-tax").html(showCurrency(tax.toFixed(2)));
-            $(".cart-grand-total").html(showCurrency(grand_total));
-        }
-
-        function render_cart_number(){
-            $(".cart-no").each(function( index ) {
-                $( this ).html(index + 1);
-            });
-        }
-
-        $("#btn-cash").click(function(){changePaymentAndStatus("cash")})
-        $("#btn-transfer").click(function(){changePaymentAndStatus("transfer")})
-        $("#btn-draft").click(function(){changePaymentAndStatus("draft")})
-
-        function changePaymentAndStatus(param){
-            if(param=="cash"){
-                $('#btn-cash').removeClass('btn-light').addClass('btn-primary');
-                $('#btn-transfer').removeClass('btn-primary').addClass('btn-light');
-                $('#btn-draft').removeClass('btn-primary').addClass('btn-light');
-                $("#transfer-proof-body").hide();
-                $("#payment_type").val(param);
-                $("#status").val("paid");
-            } else if(param=="transfer"){
-                $('#btn-cash').removeClass('btn-primary').addClass('btn-light');
-                $('#btn-transfer').removeClass('btn-light').addClass('btn-primary');
-                $('#btn-draft').removeClass('btn-primary').addClass('btn-light');
-                $("#transfer-proof-body").show();
-                $("#payment_type").val(param);
-                $("#status").val("paid");
-            } else {
-                $('#btn-cash').removeClass('btn-primary').addClass('btn-light');
-                $('#btn-transfer').removeClass('btn-primary').addClass('btn-light');
-                $('#btn-draft').removeClass('btn-light').addClass('btn-primary');
-                $("#transfer-proof-body").hide();
-                $("#payment_type").val("");
-                $("#status").val("unpaid");
-            }
-        }
-    });   
+        
+        Toast.fire({
+            type: 'success',
+            title: "{{ \Session::get('success') }}"
+        });
+    @endif
+    
+    var itemTemplate = `
+        <tr>
+            <td class="cart-no">1</td>
+            <td>
+                <input type="hidden" name="goods_id[]" class="cart-goods-id" />
+                <input type="hidden" name="unit_id[]" class="cart-unit-id" />
+                <input type="hidden" name="sub_total[]" class="cart-sub-total-input" />
+                <select class="cart-goods select-goods form-control" style="width:100% !important" required>
+                    <option></option>
+                    @foreach($goods as $good)
+                    <option value="{{$good}}">{{$good->code}} - {{$good->name}}</option>
+                    @endforeach
+                </select>
+            </td>
+            <td><input type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value="" required autofocus></td>
+            <td class="cart-unit"></td>
+            <td><input type="text" class="cart-price form-control" name="price[]" /></td>
+            <td>
+                <div style="display: block">%
+                <input style="display: inline-block; width: 60px !important" type="text" class="cart-disc form-control" name="disc[]" placeholder="Disc" value="" autofocus>
+                Rp<input style="display: inline-block; width: 100px !important" type="text" class="cart-disc-price form-control" />
+                </div>
+            </td>
+            <td class="cart-sub-total text-right"></td>
+            <td>
+                <button type="button" class="btn-dlt-cart btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+            </td>
+        </tr>
+        `;
 </script>
 @endsection
 
@@ -277,9 +166,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!--
-                            <a href="{{route('tx.regular.index')}}" class="btn btn-light">Cancel</a>
-                            -->
                         </div>
                     </div>
                 </div>
@@ -291,70 +177,78 @@
                     <h4 class="card-title">Items</h4>
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="table-responsive">
+                            <div class="table-responsive">    
                                 <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th width="40%">Name</th>
-                                            <th style="min-width:105px">Qty</th>
-                                            <th>Unit</th>
-                                            <th>Price</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="goods-cart">
-                                        @foreach($details as $key => $detail)
-                                        <tr>
-                                            <td class="cart-no">{{$key+1}}</td>
-                                            <td>
-                                                <input value="{{$detail->goods_id}}" type="hidden" name="goods_id[]" class="cart-goods-id" />
-                                                <input value="{{$detail->price}}" type="hidden" name="price[]" class="cart-price" />
-                                                <input value="{{$detail->unit_id}}" type="hidden" name="unit_id[]" class="cart-unit-id" />
-                                                <input value="{{$detail->sub_total}}" type="hidden" name="sub_total[]" class="cart-sub-total-input" />
-                                                <select class="cart-goods select-goods form-control" style="width:100% !important" required>
-                                                    <option></option>
-                                                    @foreach($goods as $good)
-                                                    <option {{($detail->goods_id==$good->id)?"selected":""}} value="{{$good}}">{{$good->code}} - {{$good->name}}</option>
-                                                    @endforeach
-                                                </select>
-                                            </td>
-                                            <td><input type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value="{{$detail->qty}}" required autofocus></td>
-                                            <td class="cart-unit">{{$detail->unit->name}}</td>
-                                            <td data-val="{{$detail->price * $detail->qty}}" class="cart-sub-total text-right">{{$tx->showCurrency($detail->price * $detail->qty)}}</td>
-                                            <td>
-                                                <button type="button" class="btn-dlt-cart btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
-                                                    <i data-feather="trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                    <tfoot>
-                                        
-                                        <tr>
-                                            <td colspan=6>           
-                                                <button id="btn-add-goods" type="button" class="btn btn-primary btn-icon w-100" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
-                                                    <i data-feather="plus"></i>ADD ITEM
-                                                </button>
-                                            </td>
-                                        </tr>
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th width="40%">Name</th>
+                                                <th style="min-width:90px">Qty</th>
+                                                <th>Unit</th>
+                                                <th style="min-width:130px">Price</th>
+                                                <th>Discount</th>
+                                                <th>Sub Total</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="goods-cart">
+                                            @foreach($details as $key => $detail)
+                                            <tr>
+                                                <td class="cart-no">{{$key+1}}</td>
+                                                <td>
+                                                    <input value="{{$detail->goods_id}}" type="hidden" name="goods_id[]" class="cart-goods-id" />
+                                                    <input value="{{$detail->unit_id}}" type="hidden" name="unit_id[]" class="cart-unit-id" />
+                                                    <input value="{{$detail->sub_total}}" type="hidden" name="sub_total[]" class="cart-sub-total-input" />
+                                                    <select class="cart-goods select-goods form-control" style="width:100% !important" required>
+                                                        <option></option>
+                                                        @foreach($goods as $good)
+                                                        <option {{($detail->goods_id==$good->id)?"selected":""}} value="{{$good}}">{{$good->code}} - {{$good->name}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td><input type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value="{{$detail->qty}}" required autofocus></td>
+                                                <td class="cart-unit">{{$detail->unit->name}}</td>
+                                                <td><input value="{{$detail->price}}" type="text" class="cart-price form-control" name="price[]" /></td>
+                                                <td>
+                                                    <div style="display: block">%
+                                                    <input value="{{$detail->disc}}" style="display: inline-block; width: 60px !important" type="text" class="cart-disc form-control" name="disc[]" placeholder="Disc" value="" autofocus>
+                                                    Rp<input value="{{($detail->price * $detail->qty) * ($detail->disc/100)}}" style="display: inline-block; width: 100px !important" type="text" class="cart-disc-price form-control" />
+                                                    </div>
+                                                </td>
+                                                <td class="cart-sub-total text-right">{{$tx->showCurrency($detail->sub_total)}}</td>
+                                                <td>
+                                                    <button type="button" class="btn-dlt-cart btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
+                                                        <i data-feather="trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                        <tfoot>
+                                            
+                                            <tr>
+                                                <td colspan=7>           
+                                                    <button id="btn-add-goods" type="button" class="btn btn-primary btn-icon w-100" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
+                                                        <i data-feather="plus"></i>ADD ITEM
+                                                    </button>
+                                                </td>
+                                            </tr>
 
-                                        <!-- <tr>
-                                            <td colspan=4 class="text-right">Total:</td>
-                                            <td class="cart-total text-right">{{$tx->showCurrency($tx->total)}}</td>
-                                        </tr> -->
-                                        <tr>
-                                            <td colspan=4 class="text-right">Tax (10%):</td>
-                                            <td class="cart-tax text-right">{{$tx->showCurrency($tx->tax)}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan=4 class="text-right">Grand Total:</td>
-                                            <td class="cart-grand-total text-right">{{$tx->showCurrency($tx->grand_total)}}</td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
+                                            <tr>
+                                                <td colspan=6 class="text-right">Total:</td>
+                                                <td class="cart-total text-right">{{$tx->showCurrency($tx->total)}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan=6 class="text-right">Tax (10%):</td>
+                                                <td class="cart-tax text-right">{{$tx->showCurrency($tx->tax)}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan=6 class="text-right">Grand Total:</td>
+                                                <td class="cart-grand-total text-right">{{$tx->showCurrency($tx->grand_total)}}</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
                         </div>
                     </div>
                 </div>

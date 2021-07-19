@@ -102,9 +102,7 @@
                                 <th>Qty</th>
                                 <th>Unit</th>
                                 <th class="text-right">Price</th>
-                                @if(isset($items[0]->disc))
                                 <th class="text-right">Discount</th>
-                                @endif
                                 <th class="text-right">Sub Total</th>
                             </tr>
                         </thead>
@@ -116,25 +114,22 @@
                                 <td>{{ $item->qty }}</td>
                                 <td>{{ $item->unit->name }}</td>
                                 <td class="text-right">{{ $tx->showCurrency($item->price) }}</td>
-                                @if(isset($item->disc))
                                 <td class="text-right">{{ $item->disc }}%</td>
-                                @endif
                                 <td class="text-right">{{ $tx->showCurrency($item->sub_total) }}</td>
                             </tr>
                             @endforeach
                         </tbody>
                         <tfoot>
-                            <?php $colspan = (isset($item->disc))? 6 : 5; ?>
-                            <!-- <tr>
-                                <td colspan={{$colspan}} class="text-right">Total :</td>
-                                <td class="cart-total text-right">{{ $tx->showCurrency($tx->total) }}</td>
-                            </tr> -->
                             <tr>
-                                <td colspan={{$colspan}} class="text-right">Tax (10%) :</td>
+                                <td colspan=6 class="text-right">Total :</td>
+                                <td class="cart-total text-right">{{ $tx->showCurrency($tx->total) }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan=6 class="text-right">Tax (10%) :</td>
                                 <td class="cart-tax text-right">{{ $tx->showCurrency($tx->tax) }}</td>
                             </tr>
                             <tr>
-                                <td colspan={{$colspan}} class="text-right"><b>Grand Total :</b></td>
+                                <td colspan=6 class="text-right"><b>Grand Total :</b></td>
                                 <td class="cart-grand-total text-right"><b>{{ $tx->showCurrency($tx->grand_total) }}</b></td>
                             </tr>
                         </tfoot>

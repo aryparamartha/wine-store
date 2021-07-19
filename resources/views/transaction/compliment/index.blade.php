@@ -89,7 +89,7 @@
                                 <tr>
                                     <td>{{$key+1}}</td>
                                     <td>{{ $tx->customer->name }}</td>
-                                    <td class="text-right">{{ $tx->showCurrency($tx->grand_total) }}</td>
+                                    <td class="text-right">{{ $tx->showCurrency($tx->total) }}</td>
                                     <td>{{ $tx->employee->name }}</td>
                                     <td>{{ $tx->localTz($tx->created_at) }}</td>
                                     <td>{{ $tx->localTz($tx->payment_date) }}</td>

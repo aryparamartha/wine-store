@@ -79,6 +79,7 @@ class RegularTxController extends Controller
                 $detail->qty = $input['qty'][$key];
                 $detail->unit_id = $input['unit_id'][$key];
                 $detail->price = $input['price'][$key];
+                $detail->disc = $input['disc'][$key] ?: 0;
                 $detail->sub_total = $input['sub_total'][$key];
                 $detail->created_at = Carbon::now()->format('Y-m-d H:i:s');
                 $detail->updated_at = Carbon::now()->format('Y-m-d H:i:s');
@@ -115,7 +116,6 @@ class RegularTxController extends Controller
             ];
         }catch(\Exception $e){
             DB::rollback();
-            die($e);
             if($request->file('tf_proof') != null){
                 File::delete($tx->getPublicPath($tx->transfer_proof));
             }
@@ -174,6 +174,7 @@ class RegularTxController extends Controller
                 $detail->qty = $input['qty'][$key];
                 $detail->unit_id = $input['unit_id'][$key];
                 $detail->price = $input['price'][$key];
+                $detail->disc = $input['disc'][$key] ?: 0;
                 $detail->sub_total = $input['sub_total'][$key];
                 $detail->created_at = Carbon::now()->format('Y-m-d H:i:s');
                 $detail->updated_at = Carbon::now()->format('Y-m-d H:i:s');
