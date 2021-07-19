@@ -29,7 +29,8 @@ class RegularTxController extends Controller
     public function invoice(RegularTx $tx){
         $comp_profile = CompanyProfile::find(1);
         $items = DetRegTx::with('goods','unit')->where('regular_tx_id', '=', $tx->id)->get();
-        return view('transaction.invoice', compact('tx', 'items', 'comp_profile'));
+        $type = "regular";
+        return view('transaction.invoice', compact('tx', 'items', 'comp_profile', 'type'));
     }
 
     public function create(){

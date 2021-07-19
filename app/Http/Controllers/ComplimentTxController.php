@@ -28,7 +28,8 @@ class ComplimentTxController extends Controller
     public function invoice(ComplimentTx $tx){
         $comp_profile = CompanyProfile::find(1);
         $items = DetComplTx::with('goods','unit')->where('compliment_tx_id', '=', $tx->id)->get();
-        return view('transaction.invoice', compact('tx', 'items', 'comp_profile'));
+        $type = "compliment";
+        return view('transaction.invoice', compact('tx', 'items', 'comp_profile', 'type'));
     }
 
     public function create(){

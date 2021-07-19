@@ -120,6 +120,7 @@
                             @endforeach
                         </tbody>
                         <tfoot>
+                            @if($type=="regular")
                             <tr>
                                 <td colspan=6 class="text-right">Total :</td>
                                 <td class="cart-total text-right">{{ $tx->showCurrency($tx->total) }}</td>
@@ -132,7 +133,23 @@
                                 <td colspan=6 class="text-right"><b>Grand Total :</b></td>
                                 <td class="cart-grand-total text-right"><b>{{ $tx->showCurrency($tx->grand_total) }}</b></td>
                             </tr>
+                            @else
+                            <tr>
+                                <td colspan=6 class="text-right"><b>Grand Total :</b></td>
+                                <td class="cart-grand-total text-right"><b>{{ $tx->showCurrency($tx->total) }}</b></td>
+                            </tr>
+                            @endif
                         </tfoot>
+                    </table>
+                    <table style="width: 60%; margin-top: 60px">
+                        <tr>
+                            <td align="center">Sender</td>
+                            <td align="center">Receiver</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-top: 50px" align="center">__________________________</td>
+                            <td style="padding-top: 50px" align="center">__________________________</td>
+                        </tr>
                     </table>
                 </div>
             </div>
