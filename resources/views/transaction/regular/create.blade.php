@@ -244,9 +244,14 @@
                                         <input type="hidden" id="grand_total" name="grand_total" value="0">
                                     </div>
                                 </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                    <button type="button" id="btn-draft" class="btn btn-primary mr-2 w-100">Keep Open</button>
+                                    </div>
+                                </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                    <button type="button" id="btn-cash" class="btn btn-primary mr-2 w-100">Cash</button>
+                                    <button type="button" id="btn-cash" class="btn btn-light mr-2 w-100">Cash</button>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -254,13 +259,8 @@
                                     <button type="button" id="btn-transfer" class="btn btn-light mr-2 w-100">Transfer</button>
                                     </div>
                                 </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                    <button type="button" id="btn-draft" class="btn btn-light mr-2 w-100">Save as Draft</button>
-                                    </div>
-                                </div>
-                                <input type="hidden" id="payment_type" name="payment_type" value="cash" />
-                                <input type="hidden" id="status" name="status" value="paid" />
+                                <input type="hidden" id="payment_type" name="payment_type" value="" />
+                                <input type="hidden" id="status" name="status" value="unpaid" />
                                 <div id="transfer-proof-body" class="col-md-12" style="display: none !important">
 									<div class="form-group">
 										<label>Upload Transfer Proof</label>

@@ -242,6 +242,11 @@
                                         <input type="hidden" id="grand_total" name="grand_total" value="{{$tx->grand_total}}">
                                     </div>
                                 </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                    <button type="button" id="btn-draft" class="btn btn-primary mr-2 w-100">Keep Open</button>
+                                    </div>
+                                </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                     <button type="button" id="btn-cash" class="btn btn-light mr-2 w-100">Cash</button>
@@ -250,11 +255,6 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                     <button type="button" id="btn-transfer" class="btn btn-light mr-2 w-100">Transfer</button>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                    <button type="button" id="btn-draft" class="btn btn-primary mr-2 w-100">Save as Draft</button>
                                     </div>
                                 </div>
                                 <input type="hidden" id="payment_type" name="payment_type" value="" />
