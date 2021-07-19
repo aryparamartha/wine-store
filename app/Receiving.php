@@ -36,7 +36,7 @@ class Receiving extends Model
         return $this->belongsTo('App\Supplier');
     }
 
-    public function detail()
+    public function details()
     {
         return $this->hasMany('App\DetReceiving');
     }

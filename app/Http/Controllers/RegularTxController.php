@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\GoodsLog;
 use App\Customer;
 use App\CompanyProfile;
 use App\DetRegTx;
@@ -70,6 +71,7 @@ class RegularTxController extends Controller
             $tx->save();
 
             $tx_details = [];
+            $logs = [];
             foreach($input['goods_id'] as $key => $goods_id){
                 $detail = new DetRegTx;
                 $detail->regular_tx_id = $tx->id;
@@ -78,13 +80,33 @@ class RegularTxController extends Controller
                 $detail->unit_id = $input['unit_id'][$key];
                 $detail->price = $input['price'][$key];
                 $detail->sub_total = $input['sub_total'][$key];
+                $detail->created_at = Carbon::now()->format('Y-m-d H:i:s');
+                $detail->updated_at = Carbon::now()->format('Y-m-d H:i:s');
                 $tx_details[] = $detail->attributesToArray();
 
                 if($tx->status=='paid'){
-                    Goods::where("id", $detail['goods_id'])->update(["amount" => DB::raw("amount - " . $detail['qty'])]);
+                    $customer = Customer::find($tx->customer_id);
+                    
+                    Goods::where("id", $detail->goods_id)->update(["amount" => DB::raw("amount - " . $detail->qty)]);
+
+                    $log_before = GoodsLog::where("goods_id", $detail->goods_id)->orderBy('id', 'DESC')->first();
+                    $log = new GoodsLog();
+                    $log->goods_id = $detail->goods_id;
+                    $log->status = "OUT";
+                    $log->date = Carbon::now()->format('Y-m-d H:i:s');
+                    $log->qty = $detail->qty;
+                    $log->post_amount = ($log_before->post_amount ?? 0) - $detail->qty;
+                    $log->price = $detail->sub_total;
+                    $log->source = $customer->name;
+                    $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
+                    $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');
+                    $logs[] = $log->attributesToArray();
                 }
             }
             DetRegTx::insert($tx_details);
+            if($tx->status=='paid'){
+                GoodsLog::insert($logs);
+            }
 
             DB::commit();
             $notif = [
@@ -144,6 +166,7 @@ class RegularTxController extends Controller
             DetRegTx::where('regular_tx_id', $tx->id)->delete();
             
             $tx_details = [];
+            $logs = [];
             foreach($input['goods_id'] as $key => $goods_id){
                 $detail = new DetRegTx;
                 $detail->regular_tx_id = $tx->id;
@@ -152,14 +175,34 @@ class RegularTxController extends Controller
                 $detail->unit_id = $input['unit_id'][$key];
                 $detail->price = $input['price'][$key];
                 $detail->sub_total = $input['sub_total'][$key];
+                $detail->created_at = Carbon::now()->format('Y-m-d H:i:s');
+                $detail->updated_at = Carbon::now()->format('Y-m-d H:i:s');
                 $tx_details[] = $detail->attributesToArray();
                 
                 if($tx->status=='paid'){
-                    Goods::where("id", $detail['goods_id'])->update(["amount" => DB::raw("amount - " . $detail['qty'])]);
+                    $customer = Customer::find($tx->customer_id);
+
+                    Goods::where("id", $detail->goods_id)->update(["amount" => DB::raw("amount - " . $detail->qty)]);
+
+                    $log_before = GoodsLog::where("goods_id", $detail->goods_id)->orderBy('id', 'DESC')->first();
+                    $log = new GoodsLog();
+                    $log->goods_id = $detail->goods_id;
+                    $log->status = "OUT";
+                    $log->date = Carbon::now()->format('Y-m-d H:i:s');
+                    $log->qty = $detail->qty;
+                    $log->post_amount = ($log_before->post_amount ?? 0) - $detail->qty;
+                    $log->price = $detail->sub_total;
+                    $log->source = $customer->name;
+                    $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
+                    $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');
+                    $logs[] = $log->attributesToArray();
                 }
             }
             DetRegTx::insert($tx_details);
-            
+            if($tx->status=='paid'){
+                GoodsLog::insert($logs);
+            }
+
             DB::commit();
             $notif = [
                 "type" => "success",

@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Supplier;
+use App\Goods;
+use App\GoodsLog;
 use App\CompanyProfile;
 use App\DetReceiving;
-use App\Goods;
 use App\Receiving;
 use App\Seller;
+use App\Supplier;
 use App\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,25 +52,42 @@ class ReceivingController extends Controller
         $receiving->grand_total = $input['grand_total'];
         $receiving->receiving_date = $input['receiving_date'];
 
-        $receiving_details = [];
-        foreach($input['goods_id'] as $key => $goods_id){
-            $detail = new DetReceiving;
-            $detail->goods_id = $goods_id;
-            $detail->qty = $input['qty'][$key];
-            $detail->unit_id = $input['unit_id'][$key];
-            $detail->price = $input['price'][$key];
-            $detail->sub_total = $input['sub_total'][$key];
-            $receiving_details[] = $detail;
-        }
         try{
             DB::beginTransaction();
 
             $receiving->save();
-
-            foreach($receiving_details as $detail) {
+            DetReceiving::where('receiving_id', $receiving->id)->delete();
+            
+            $receiving_details = [];
+            foreach($input['goods_id'] as $key => $goods_id){
+                $detail = new DetReceiving;
                 $detail->receiving_id = $receiving->id;
-                $detail->save();
+                $detail->goods_id = $goods_id;
+                $detail->qty = $input['qty'][$key];
+                $detail->unit_id = $input['unit_id'][$key];
+                $detail->price = $input['price'][$key];
+                $detail->sub_total = $input['sub_total'][$key];
+                $detail->created_at = Carbon::now()->format('Y-m-d H:i:s');
+                $detail->updated_at = Carbon::now()->format('Y-m-d H:i:s');
+                $receiving_details[] = $detail->attributesToArray();
+                
+                $supplier = Supplier::find($receiving->supplier_id);
+                $log_before = GoodsLog::where("goods_id", $detail->goods_id)->orderBy('id', 'DESC')->first();
+                $log = new GoodsLog();
+                $log->goods_id = $detail->goods_id;
+                $log->status = "IN";
+                $log->date = Carbon::now()->format('Y-m-d H:i:s');
+                $log->qty = $detail->qty;
+                $log->post_amount = ($log_before->post_amount ?? 0) + $detail->qty;
+                $log->price = $detail->sub_total;
+                $log->source = $supplier->name;
+                $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
+                $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');
+                $logs[] = $log->attributesToArray();
             }
+            DetReceiving::insert($receiving_details);
+            GoodsLog::insert($logs);
+
             DB::commit();
             $notif = [
                 "type" => "success",
@@ -106,26 +124,61 @@ class ReceivingController extends Controller
         $receiving->grand_total = $input['grand_total'];
         $receiving->receiving_date = $input['receiving_date'];
 
-        $receiving_details = [];
-        foreach($input['goods_id'] as $key => $goods_id){
-            $detail = new DetReceiving;
-            $detail->goods_id = $goods_id;
-            $detail->qty = $input['qty'][$key];
-            $detail->unit_id = $input['unit_id'][$key];
-            $detail->price = $input['price'][$key];
-            $detail->sub_total = $input['sub_total'][$key];
-            $receiving_details[] = $detail;
-        }
         try{
             DB::beginTransaction();
+            $supplier = Supplier::find($receiving->supplier_id);
 
             $receiving->save();
-            DetReceiving::where('receiving_id', $receiving->id)->delete();
-
-            foreach($receiving_details as $detail) {
-                $detail->receiving_id = $receiving->id;
-                $detail->save();
+            $details = $receiving->details;
+            $logs = [];
+            foreach($details as $key => $detail){ //log previous goods as out
+                $log_before = GoodsLog::where("goods_id", $detail->goods_id)->orderBy('id', 'DESC')->first();
+                $log = new GoodsLog();
+                $log->goods_id = $detail->goods_id;
+                $log->status = "OUT";
+                $log->date = Carbon::now()->format('Y-m-d H:i:s');
+                $log->qty = $detail->qty;
+                $log->post_amount = ($log_before->post_amount ?? 0) - $detail->qty;
+                $log->price = $detail->sub_total;
+                $log->source = $supplier->name;
+                $log->note = "Delete receiving";
+                $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
+                $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');
+                $logs[] = $log->attributesToArray();
             }
+            DetReceiving::where('receiving_id', $receiving->id)->delete();
+            GoodsLog::insert($logs);
+            
+            $receiving_details = [];
+            $logs = [];
+            foreach($input['goods_id'] as $key => $goods_id){
+                $detail = new DetReceiving;
+                $detail->receiving_id = $receiving->id;
+                $detail->goods_id = $goods_id;
+                $detail->qty = $input['qty'][$key];
+                $detail->unit_id = $input['unit_id'][$key];
+                $detail->price = $input['price'][$key];
+                $detail->sub_total = $input['sub_total'][$key];
+                $detail->created_at = Carbon::now()->format('Y-m-d H:i:s');
+                $detail->updated_at = Carbon::now()->format('Y-m-d H:i:s');
+                $receiving_details[] = $detail->attributesToArray();
+
+                $log_before = GoodsLog::where("goods_id", $detail->goods_id)->orderBy('id', 'DESC')->first();
+                $log = new GoodsLog();
+                $log->goods_id = $detail->goods_id;
+                $log->status = "IN";
+                $log->date = Carbon::now()->format('Y-m-d H:i:s');
+                $log->qty = $detail->qty;
+                $log->post_amount = ($log_before->post_amount ?? 0) + $detail->qty;
+                $log->price = $detail->sub_total;
+                $log->source = $supplier->name;
+                $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
+                $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');
+                $logs[] = $log->attributesToArray();
+            }
+            DetReceiving::insert($receiving_details);
+            GoodsLog::insert($logs);
+
             DB::commit();
             $notif = [
                 "type" => "success",
@@ -136,7 +189,7 @@ class ReceivingController extends Controller
             die($e);
             $notif = [
                 "type" => "failed",
-                "message" => "Failed to updated receiving!"
+                "message" => "Failed to update receiving!"
             ];
         }
 
@@ -145,8 +198,44 @@ class ReceivingController extends Controller
 
     public function destroy(Receiving $receiving)
     {
-        DetReceiving::where('receiving_id', $receiving->id)->delete();
-        $receiving->delete();
+        try{
+            DB::beginTransaction();
+            $supplier = Supplier::find($receiving->supplier_id);
+
+            $details = $receiving->details;
+            $logs = [];
+            foreach($details as $key => $detail){ //log previous goods as out
+                $log_before = GoodsLog::where("goods_id", $detail->goods_id)->orderBy('id', 'DESC')->first();
+                $log = new GoodsLog();
+                $log->goods_id = $detail->goods_id;
+                $log->status = "OUT";
+                $log->date = Carbon::now()->format('Y-m-d H:i:s');
+                $log->qty = $detail->qty;
+                $log->post_amount = ($log_before->post_amount ?? 0) - $detail->qty;
+                $log->price = $detail->sub_total;
+                $log->source = $supplier->name;
+                $log->note = "Delete receiving";
+                $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
+                $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');
+                $logs[] = $log->attributesToArray();
+            }
+            DetReceiving::where('receiving_id', $receiving->id)->delete();
+            GoodsLog::insert($logs);
+            $receiving->delete();
+        
+            DB::commit();
+            $notif = [
+                "type" => "success",
+                "message" => "Receiving has been deleted!"
+            ];
+        }catch(\Exception $e){
+            DB::rollback();
+            die($e);
+            $notif = [
+                "type" => "failed",
+                "message" => "Failed to delete receiving!"
+            ];
+        }
         return redirect()->route('receiving.index')->with('success', 'Receiving data has been deleted!');
     }
 }
