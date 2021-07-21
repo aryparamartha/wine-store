@@ -56,13 +56,10 @@ Route::group(['prefix' => 'pegawai'], function()
     Route::post('/delete/{pegawai}', 'PegawaiController@destroy')->name('pegawai.delete');
 }); 
 
-Route::group(['prefix' => 'pengerjaan'], function()
+Route::group(['prefix' => 'profile'], function()
 {
-    Route::get('/', 'PengerjaanController@index')->name('pengerjaan.index');
-    Route::post('/store', 'PengerjaanController@store')->name('pengerjaan.store');
-    Route::post('/update/{id}', 'PengerjaanController@update')->name('pengerjaan.update');
-    Route::post('/delete/{pengerjaan}', 'PengerjaanController@destroy')->name('pengerjaan.delete');
-    Route::get('/print/{pengerjaan}', 'PengerjaanController@print')->name('pengerjaan.print');
+    Route::get('/', 'CompanyProfileController@index')->name('profile.index');
+    Route::post('/update/{profile}', 'CompanyProfileController@update')->name('profile.update');
 }); 
 
 /*===============================

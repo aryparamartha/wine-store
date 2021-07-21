@@ -83,6 +83,12 @@
                     <span class="link-title">Sellers</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="{{route('profile.index')}}" class="nav-link">
+                    <i class="link-icon" data-feather="briefcase"></i>
+                    <span class="link-title">Company Profile</span>
+                </a>
+            </li>
         </ul>
     </div>
 </nav>
