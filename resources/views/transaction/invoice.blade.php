@@ -51,7 +51,12 @@
             <div class="card-body">
                 <div class="row mb-20">
                     <div class="col-md-6 col-6">
+                        @if ($type=="regular")
                         <h5>INVOICE</h5>
+                        @else
+                        <h5>SURAT JALAN</h5>
+                        @endif
+                        
                         <h5>{{ $tx->invoice_id }}</h5>
                         {{ $tx->payment_date }}
                         <br/>
@@ -69,28 +74,29 @@
                                     <td>{{$tx->customer->name}}</td>
                                 </tr>
                                 <tr>
-                                    <td>{{$comp_profile->address}}</td>
+                                    <td>{{$comp_profile->pt_name}}</td>
                                     <td>{{$tx->customer->address}}</td>
                                 </tr>
                                 <tr>
-                                    <td>{{$comp_profile->phone}}</td>
+                                    <td>{{$comp_profile->address}}</td>
                                     <td>{{$tx->customer->number}}</td>
                                 </tr>
                                 <tr>
-                                    <td>{{$comp_profile->email}}</td>
+                                    <td></td>
                                     <td>{{$tx->customer->email}}</td>
                                 </tr>
+                                {{-- website --}}
                                 <tr>
-                                    <td>{{$comp_profile->website}}</td>
+                                    <td></td>
                                     <td></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     <div class="col-md-6 col-6">
-                        <div class="flt-right">
+                        {{-- <div class="flt-right">
                             <img max-height="110px" width="110px" src="/{{$comp_profile->logo}}" />
-                        </div>  
+                        </div>   --}}
                     </div>
                 </div>
                 <div class="table-responsive">
