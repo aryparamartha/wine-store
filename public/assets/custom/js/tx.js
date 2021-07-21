@@ -22,11 +22,11 @@ $(document).ready(function () {
 
         render_cart_number();
     });
-    $("#goods-cart").on('change', '.select-goods', change_selected_goods)
-    $("#goods-cart").on('change', '.cart-qty', change_qty)
-    $("#goods-cart").on('change', '.cart-price', change_price)
-    $("#goods-cart").on('change', '.cart-disc', change_disc)
-    $("#goods-cart").on('change', '.cart-disc-price', change_disc_price)
+    $("#goods-cart").on('change blur', '.select-goods', change_selected_goods)
+    $("#goods-cart").on('change blur', '.cart-qty', change_qty)
+    $("#goods-cart").on('change blur', '.cart-price', change_price)
+    $("#goods-cart").on('change blur', '.cart-disc', change_disc)
+    $("#goods-cart").on('change blur', '.cart-disc-price', change_disc_price)
     $("#goods-cart").on('click', '.btn-dlt-cart', delete_cart)
 
     function calculate_sub_total(index){
@@ -80,8 +80,28 @@ $(document).ready(function () {
         change_discount(index);
     }
 
+    function check_stock(index){
+        let select_goods_val = $(".cart-goods").eq(index).val();
+        let goods = JSON.parse(select_goods_val);
+        let total = 0;
+        $('.cart-goods-id[value="'+goods.id+'"]').each(function(){
+            let index = $(this).index(".cart-goods-id");
+            total += parseInt($(".cart-qty").eq(index).val());
+        });
+
+        if(total > goods.amount) {
+            Swal.fire({
+                type: 'error',
+                title: "Input qty is more than available stock!",
+                showConfirmButton: true
+            });
+            $(".cart-qty").eq(index).val("")
+        }
+    }
+
     function change_qty(){
         let index = $(this).index(".cart-qty");
+        check_stock(index);
         change_discount(index);
     }
 
@@ -94,6 +114,7 @@ $(document).ready(function () {
         $(".cart-unit-id").eq(index).val(goods.unit.id)
         $(".cart-unit").eq(index).html(goods.unit.name)
 
+        check_stock(index);
         change_discount(index);
     }
 

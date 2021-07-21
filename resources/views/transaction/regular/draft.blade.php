@@ -22,7 +22,7 @@
 
 @section('custom-js')
 <script src="{{asset('assets/js/data-table.js')}}"></script>
-<script src="{{asset('assets/js/custom/tx.js')}}"></script>
+<script src="{{asset('assets/custom/js/tx.js')}}"></script>
 <script>
     @if (\Session::has('success'))  
         const Toast = Swal.mixin({
