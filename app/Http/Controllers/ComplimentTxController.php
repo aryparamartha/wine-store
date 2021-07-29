@@ -226,7 +226,8 @@ class ComplimentTxController extends Controller
                 }
             }
             DetComplTx::insert($tx_details);
-            if($tx->status=='paid' || $tx->status=='down payment'){
+            //if previous status is unpaid and the current status != unpaid, create product logs
+            if($previous_status=='unpaid' && ($tx->status=='paid' || $tx->status=='down payment')){
                 GoodsLog::insert($logs);
             }
 
