@@ -69,11 +69,48 @@
             </td>
         </tr>
         `;
+
+    var paymentTemplate = `
+        <div class="col-md-12">
+            <div class="form-group border-bottom">
+                <div class="row">
+                    <div class="col-md-12 pb-2">
+                        <label for="payment_id">Payment <span class="payment-no">1</span></label>
+                        <button type="button" style="float:right" class="btn-dlt-payment btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <input value="{{$payment_types[0]->name}}" type="hidden" name="payment_name[]" class="payment-name"/>
+                        <select name="payment_id[]" class="select-payment-id w-100 form-control">
+                            @foreach($payment_types as $payment)
+                            <option value="{{$payment->id}}">{{$payment->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6 pb-2">
+                        <input type="text" class="paid-amount form-control" name="paid_amount[]">
+                    </div>
+                    <div class="col-md-12 transfer-proof-body" style="display:none">
+                        <div class="form-group">
+                            <input type="file" name="payment_proof[]" class="file-upload-default">
+                            <div class="input-group col-xs-12">
+                                <input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Proof">
+                                <span class="input-group-append">
+                                    <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 </script>
 @endsection
 
 @section('content')
-<form name="memberForm" class="forms-sample" action="{{route('tx.regular.update', $tx)}}" method="POST">
+<form id="form-tx" class="forms-sample" action="{{route('tx.regular.update', $tx)}}" method="POST" enctype='multipart/form-data'>
     @csrf
 <div class="page-content">
     <div class="row">
@@ -124,42 +161,133 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="name">Total</label>
+                                        <label for="name">Grand Total</label>
                                         <h3 class="cart-grand-total text-right">{{$tx->showCurrency($tx->grand_total)}}</h3>
                                         <input type="hidden" id="total" name="total" value="{{$tx->total}}">
+                                        <input type="hidden" id="_tax" value="0.1">
                                         <input type="hidden" id="tax" name="tax" value="{{$tx->tax}}">
                                         <input type="hidden" id="grand_total" name="grand_total" value="{{$tx->grand_total}}">
+                                        <input type="hidden" id="total_paid" name="total_paid" value="0">
+                                        <input type="hidden" id="remainder" name="remainder" value="{{$tx->remainder}}">
+                                        <input type="hidden" id="already_paid" name="already_paid" value="{{$tx->total_paid}}">
                                     </div>
                                 </div>
                                 <div class="col-md-12">
-                                    <div class="form-group">
-                                    <button type="button" id="btn-draft" class="btn btn-primary mr-2 w-100">Keep Open</button>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="name">Total Paid</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5 class="cart-total-paid text-right">{{$tx->showCurrency($tx->total_paid)}}</h5>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="name">Remainder</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <h5 class="cart-remainder text-right">{{$tx->showCurrency($tx->remainder)}}</h5>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                    <button type="button" id="btn-cash" class="btn btn-light mr-2 w-100">Cash</button>
+                                    <?php
+                                    $disabled = "";
+                                    $payment_class = "btn-light";
+                                    $keep_open_class = "btn-primary";
+                                    if($tx->status=="down payment"){
+                                        $disabled = "disabled";
+                                        $payment_class = "btn-primary";
+                                        $keep_open_class = "btn-light";
+                                    }
+                                    ?>
+                                    <button  {{ $disabled }} type="button" id="btn-draft" class="btn {{ $keep_open_class }} mr-2 w-100">Keep Open</button>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                    <button type="button" id="btn-transfer" class="btn btn-light mr-2 w-100">Transfer</button>
+                                    <button type="button" id="btn-payment" class="btn {{ $payment_class }} mr-2 w-100">Payment</button>
                                     </div>
                                 </div>
-                                <input type="hidden" id="payment_type" name="payment_type" value="" />
-                                <input type="hidden" id="status" name="status" value="unpaid" />
-                                <div id="transfer-proof-body" class="col-md-12" style="display: none !important">
-									<div class="form-group">
-										<label>Upload Transfer Proof</label>
-										<input type="file" name="img[]" class="file-upload-default">
-										<div class="input-group col-xs-12">
-											<input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Image">
-											<span class="input-group-append">
-												<button class="file-upload-browse btn btn-primary" type="button">Upload</button>
-											</span>
-										</div>
-									</div>
+                                @if($tx->status=="unpaid")
+                                <div id="payment-wrap" style="display:none">
+                                @else
+                                <div id="payment-wrap">
+                                @endif
+                                    @foreach($tx->payment_logs as $key=>$payment_log)
+                                    <div class="col-md-12">
+                                        <div class="form-group border-bottom">
+                                            <div class="row">
+                                                <div class="col-md-12 pb-2">
+                                                    <label for="payment_id">Payment <span class="payment-no">{{$key+1}}</span></label>
+                                                    @if($payment_log->payment_type_id!=1)
+                                                    <button type="button" style="float:right" class="btn-payment-proof btn btn-light btn-icon">
+                                                    <i data-feather="file"></i>
+                                                    </button>
+                                                    @endif
+                                                </div>
+                                                <div class="col-md-6">
+                                                    @foreach($payment_types as $payment)
+                                                    @if($payment->id==$payment_log->payment_type_id)
+                                                    <input value="{{$payment->name}}" type="text" class="form-control" readonly>
+                                                    @endif
+                                                    @endforeach
+                                                </div>
+                                                <div class="col-md-6 pb-2">
+                                                    <input value="{{$payment_log->paid_amount}}" type="text" class="form-control" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                    <div id="payment-body">
+                                        @if(!count($tx->payment_logs))
+                                        <div class="col-md-12">
+                                            <div class="form-group border-bottom">
+                                                <div class="row">
+                                                    <div class="col-md-12 pb-2">
+                                                        <label for="payment_id">Payment <span class="payment-no">1</span></label>
+                                                        <button type="button" style="float:right" class="btn-dlt-payment btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
+                                                            <i data-feather="trash"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input value="{{$payment_types[0]->name}}" type="hidden" name="payment_name[]" class="payment-name"/>
+                                                        <select name="payment_id[]" class="select-payment-id w-100 form-control">
+                                                            @foreach($payment_types as $payment)
+                                                            <option value="{{$payment->id}}">{{$payment->name}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6 pb-2">
+                                                        <input type="text" class="paid-amount form-control" name="paid_amount[]">
+                                                    </div>
+                                                    <div class="col-md-12 transfer-proof-body" style="display:none">
+                                                        <div class="form-group">
+                                                            <input type="file" name="payment_proof[]" class="file-upload-default">
+                                                            <div class="input-group col-xs-12">
+                                                                <input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Proof">
+                                                                <span class="input-group-append">
+                                                                    <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                        <button type="button" id="btn-add-payment" class="btn btn-secondary mr-2 w-100">Add Payment</button>
+                                        </div>
+                                    </div>
                                 </div>
+                                <input type="hidden" id="status" name="status" value="{{$tx->status}}" />
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-success mr-2 w-100">Submit</button>

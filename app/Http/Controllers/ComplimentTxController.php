@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\GoodsLog;
 use App\Customer;
 use App\CompanyProfile;
+use App\ComplimentTx;
 use App\DetComplTx;
 use App\Goods;
-use App\ComplimentTx;
+use App\GoodsLog;
+use App\PaymentType;
 use App\Seller;
+use App\TxPaymentLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -36,14 +38,15 @@ class ComplimentTxController extends Controller
         $goods = Goods::with('unit')->get();
         $customers = Customer::get();
         $sellers = Seller::get();
-        return view('transaction.compliment.create', compact('goods', 'customers', 'sellers'));
+        $payment_types = PaymentType::get();
+        return view('transaction.compliment.create', compact('goods', 'customers', 'sellers', 'payment_types'));
     }
 
     public function store(Request $request)
     {
         $notif = [];
         $input = $request->all();
-        
+
         $tx = new ComplimentTx;
         $tx->invoice_id = ComplimentTx::genInvoiceNo();
         $tx->employee_id = Auth::user()->id;
@@ -52,23 +55,16 @@ class ComplimentTxController extends Controller
         $tx->total = $input['total'];
         $tx->tax = $input['tax'];
         $tx->grand_total = $input['grand_total'];
-        $tx->payment_type = $input['payment_type'];
         $tx->status = $input['status'];
+        $tx->total_paid = $input['total_paid'];
+        $tx->remainder = $input['remainder'];
 
-        if($tx->status=='paid'){
-            $tx->payment_date =  Carbon::now()->format('Y-m-d H:i:s');
-        }
-
-        //upload
-        if($request->file('tf_proof') != null){
-            $tx->transfer_proof = $tx->invoice_id . "_transfer." . $request->file('tf_proof')->getClientOriginalExtension();
-            $tx->uploadPhoto($request->file('tf_proof'), $tx->transfer_proof);
-        }
-
+        $log_payment_proofs = [];
         try{
             DB::beginTransaction();
 
             $tx->save();
+            $payment_type = [];
 
             $tx_details = [];
             $logs = [];
@@ -85,7 +81,7 @@ class ComplimentTxController extends Controller
                 $detail->updated_at = Carbon::now()->format('Y-m-d H:i:s');
                 $tx_details[] = $detail->attributesToArray();
                 
-                if($tx->status=='paid'){
+                if($tx->status=='paid' || $tx->status=='down payment'){
                     $customer = Customer::find($tx->customer_id);
                     
                     Goods::where("id", $detail->goods_id)->update(["amount" => DB::raw("amount - " . $detail->qty)]);
@@ -105,19 +101,53 @@ class ComplimentTxController extends Controller
                 }
             }
             DetComplTx::insert($tx_details);
-            if($tx->status=='paid'){
+            if($tx->status=='paid' || $tx->status=='down payment'){
                 GoodsLog::insert($logs);
             }
-            
+
+            //insert log payment if tx status is not unpaid
+            if($tx->status!='unpaid'){
+                $log_payments = [];
+                foreach($input['payment_id'] as $key => $payment_id){
+                    $log_payment = new TxPaymentLog();
+                    $log_payment->tx_id = $tx->id;
+                    $log_payment->logable_id = $tx->id;
+                    $log_payment->logable_type = 'App\ComplimentTx';
+                    $log_payment->payment_type_id = $payment_id;
+                    $log_payment->paid_amount = $input['paid_amount'][$key];
+                    $log_payment->tx_type = 0;
+                    $log_payment->pic = Auth::user()->id;
+                    $log_payment->payment_proof = "";
+                    //upload
+                    $file = $request->file('payment_proof');
+                    if($file !== null && array_key_exists($key, $file)){
+                        $log_payment->payment_proof = $tx->invoice_id . "_proof_". ($key+1) ."." . $file[$key]->getClientOriginalExtension();
+                        $log_payment->uploadPhoto($file[$key], $log_payment->payment_proof);
+                        $log_payment_proofs[] = $log_payment;
+                    }
+                    $log_payment->created_at = Carbon::now()->format('Y-m-d H:i:s');
+                    $log_payments[] = $log_payment->attributesToArray();
+                    $payment_type[] = $input['payment_name'][$key];
+                }
+                TxPaymentLog::insert($log_payments);
+                //update payment date
+                if(count($log_payments)){
+                    $tx->payment_date =  Carbon::now()->format('Y-m-d H:i:s');
+                    $tx->payment_type = join(", ", array_unique($payment_type));
+                    $tx->save();
+                }
+            }
+       
             DB::commit();
             $notif = [
                 "type" => "success",
                 "message" => "Surat Jalan has been created!"
             ];
         }catch(\Exception $e){
+            dd($e);
             DB::rollback();
-            if($request->file('tf_proof') != null){
-                File::delete($tx->getPublicPath($tx->transfer_proof));
+            foreach($log_payment_proofs as $log_payment){
+                File::delete($log_payment[$key]->getPaymentProof());
             }
             $notif = [
                 "type" => "failed",
@@ -133,7 +163,8 @@ class ComplimentTxController extends Controller
         $goods = Goods::with('unit')->get();
         $customers = Customer::get();
         $sellers = Seller::get();
-        return view('transaction.compliment.draft', compact('tx', 'details', 'goods', 'customers', 'sellers'));
+        $payment_types = PaymentType::get();
+        return view('transaction.compliment.draft', compact('tx', 'details', 'goods', 'customers', 'sellers', 'payment_types'));
     }
 
     public function update(Request $request, ComplimentTx $tx)
@@ -146,23 +177,17 @@ class ComplimentTxController extends Controller
         $tx->total = $input['total'];
         $tx->tax = $input['tax'];
         $tx->grand_total = $input['grand_total'];
-        $tx->payment_type = $input['payment_type'];
+        $previous_status = $tx->status; //get prev tx status before update it
         $tx->status = $input['status'];
-        
-        if($tx->status=='paid'){
-            $tx->payment_date =  Carbon::now()->format('Y-m-d H:i:s');
-        }
+        $tx->total_paid = $input['total_paid'];
+        $tx->remainder = $input['remainder'];
 
-        //upload
-        if($request->file('tf_proof') != null){
-            $tx->transfer_proof = $tx->invoice_id . "_transfer." . $request->file('tf_proof')->getClientOriginalExtension();
-            $tx->uploadPhoto($request->file('tf_proof'), $tx->transfer_proof);
-        }
-
+        $log_payment_proofs = [];
         try{
             DB::beginTransaction();
 
             $tx->save();
+            $payment_type = explode(", ", $tx->payment_type);
             DetComplTx::where('compliment_tx_id', $tx->id)->delete();
             
             $tx_details = [];
@@ -180,7 +205,8 @@ class ComplimentTxController extends Controller
                 $detail->updated_at = Carbon::now()->format('Y-m-d H:i:s');
                 $tx_details[] = $detail->attributesToArray();
                 
-                if($tx->status=='paid'){
+                //if previous status is unpaid and the current status != unpaid, update the products stock
+                if($previous_status=='unpaid' && ($tx->status=='paid' || $tx->status=='down payment')){
                     $customer = Customer::find($tx->customer_id);
                     
                     Goods::where("id", $detail->goods_id)->update(["amount" => DB::raw("amount - " . $detail->qty)]);
@@ -200,8 +226,41 @@ class ComplimentTxController extends Controller
                 }
             }
             DetComplTx::insert($tx_details);
-            if($tx->status=='paid'){
+            if($tx->status=='paid' || $tx->status=='down payment'){
                 GoodsLog::insert($logs);
+            }
+
+            //insert log payment if tx status is not unpaid
+            if($tx->status!='unpaid'){
+                $log_payments = [];
+                foreach($input['payment_id'] as $key => $payment_id){
+                    $log_payment = new TxPaymentLog();
+                    $log_payment->tx_id = $tx->id;
+                    $log_payment->logable_id = $tx->id;
+                    $log_payment->logable_type = 'App\ComplimentTx';
+                    $log_payment->payment_type_id = $payment_id;
+                    $log_payment->paid_amount = $input['paid_amount'][$key];
+                    $log_payment->tx_type = 0;
+                    $log_payment->pic = Auth::user()->id;
+                    $log_payment->payment_proof = "";
+                    //upload
+                    $file = $request->file('payment_proof');
+                    if($file !== null && array_key_exists($key, $file)){
+                        $log_payment->payment_proof = $tx->invoice_id . "_proof_". ($key+1) ."." . $file[$key]->getClientOriginalExtension();
+                        $log_payment->uploadPhoto($file[$key], $log_payment->payment_proof);
+                        $log_payment_proofs[] = $log_payment;
+                    }
+                    $log_payment->created_at = Carbon::now()->format('Y-m-d H:i:s');
+                    $log_payments[] = $log_payment->attributesToArray();
+                    $payment_type[] = $input['payment_name'][$key];
+                }
+                TxPaymentLog::insert($log_payments);
+                //update payment date
+                if(count($log_payments)){
+                    $tx->payment_date =  Carbon::now()->format('Y-m-d H:i:s');
+                    $tx->payment_type = join(", ", array_unique($payment_type));
+                    $tx->save();
+                }
             }
 
             DB::commit();
@@ -211,13 +270,14 @@ class ComplimentTxController extends Controller
             ];
         }catch(\Exception $e){
             DB::rollback();
-            if($request->file('tf_proof') != null){
-                File::delete($tx->getPublicPath($tx->transfer_proof));
+            foreach($log_payment_proofs as $log_payment){
+                File::delete($log_payment[$key]->getPaymentProof());
             }
             $notif = [
                 "type" => "failed",
                 "message" => "Failed to update Surat Jalan!"
             ];
+            dd($e);
         }
 
         return redirect()->route('tx.compliment.index')->with($notif['type'], $notif['message']);

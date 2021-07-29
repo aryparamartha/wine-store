@@ -1,3 +1,4 @@
+var status = "draft";
 const truncateByDecimalPlace = (value, numDecimalPlaces) => Math.trunc(value * Math.pow(10, numDecimalPlaces)) / Math.pow(10, numDecimalPlaces)
 function numberWithCommas(x) {
     var parts = x.toString().replace(".",",").split(",");
@@ -9,30 +10,67 @@ function numberWithCommas(x) {
 function showCurrency(x){
     return "Rp" + numberWithCommas(x);
 }
-$(document).ready(function () {
-    $("#customer_id").select2({placeholder: "Select Customer"});
-    $("#seller_id").select2({placeholder: "Select Seller"});
-    $(".select-goods").select2({placeholder: "Select Product"});
 
-    var total = 0;
-
-    $("#btn-add-goods").click(function(){
-        $("#goods-cart").append(itemTemplate);
-        $(".select-goods").select2({placeholder: "Select Product"});
-
-        render_cart_number();
+$(function() {
+    'use strict';
+    $(function() {
+        $("#payment-wrap").on('click', '.file-upload-browse', function(e) {
+            var file = $(this).parent().parent().parent().find('.file-upload-default');
+            file.trigger('click');
+        });
+        $("#payment-wrap").on('change', '.file-upload-default', function() {
+            $(this).parent().find('.form-control').val($(this).val().replace(/C:\\fakepath\\/i, ''));
+        });
     });
+});
+
+$(function() {
+    status = ($("#status").val() != "unpaid") ? "payment" : "draft";
+    $("#customer_id").select2({placeholder: "Select Customer", width: '100%'});
+    $("#seller_id").select2({placeholder: "Select Seller", width: '100%'});
+    $(".select-payment-id").select2({placeholder: "Select Payment Method", width: '100%'});
+    $(".select-goods").select2({placeholder: "Select Product", width: '100%'});
+
     $("#goods-cart").on('change blur', '.select-goods', change_selected_goods)
     $("#goods-cart").on('change blur', '.cart-qty', change_qty)
     $("#goods-cart").on('change blur', '.cart-price', change_price)
     $("#goods-cart").on('change blur', '.cart-disc', change_disc)
     $("#goods-cart").on('change blur', '.cart-disc-price', change_disc_price)
     $("#goods-cart").on('click', '.btn-dlt-cart', delete_cart)
+    
+    $("#payment-wrap").on('click', '.btn-dlt-payment', delete_payment)
+    $("#payment-wrap").on('change blur', '.select-payment-id', change_payment)
+    $("#payment-wrap").on('keyup', '.paid-amount', calculate_current_paid)
+
+    $("#btn-add-goods").click(function(){
+        $("#goods-cart").append(itemTemplate);
+        $(".select-goods").select2({placeholder: "Select Product", width: '100%'});
+
+        render_cart_number();
+    });
+    $("#btn-add-payment").click(function(){
+        $("#payment-body").append(paymentTemplate);
+        $(".select-payment-id").select2({placeholder: "Select Payment Method", width: '100%'});
+
+        render_payment_number();
+    });
+
+    function change_payment(){
+        let index = $(this).index(".select-payment-id");
+        let payment_type = $(this).select2('data')[0].text;
+        $(".payment-name").eq(index).val(payment_type);
+        if($(this).val()!="1"){
+            $(".transfer-proof-body").eq(index).show();
+        } else {
+            $(".transfer-proof-body").eq(index).hide();
+            $(".file-upload-default").eq(index).val("");
+            $(".file-upload-info").eq(index).val("");
+        }
+    }
 
     function calculate_sub_total(index){
         let price = $(".cart-price").eq(index).val();
         let qty = $(".cart-qty").eq(index).val();
-        let disc = $(".cart-disc").eq(index).val();
         let disc_price = $(".cart-disc-price").eq(index).val();
 
         let sub_total = price * qty;
@@ -125,12 +163,21 @@ $(document).ready(function () {
         calculate_total();
     }
 
+    function delete_payment(){
+        let index = $(this).index(".btn-dlt-payment");
+        $("#payment-body > div").eq(index).remove();
+        render_payment_number();
+        calculate_total()
+    }
+
     function calculate_total(){
         let total = 0;
+        let _tax = parseFloat($("#_tax").val());
         $(".cart-sub-total-input").each(function( index ) {
-            total+= parseInt($(this).val());
+            let sub_total = parseFloat($(this).val());
+            total+=  isNaN(sub_total) ? 0 : sub_total; 
         });
-        let tax = 0.1 * total;
+        let tax = _tax * total;
         let grand_total = total + tax;
         
         $("#total").val(total);
@@ -140,40 +187,111 @@ $(document).ready(function () {
         $(".cart-total").html(showCurrency(total));
         $(".cart-tax").html(showCurrency(tax.toFixed(2)));
         $(".cart-grand-total").html(showCurrency(grand_total));
+        
+        if(status=="draft") calculate_already_paid();
+        else calculate_current_paid();
+        console.log(status)
+    }
+
+    //calculate already paid (without new payments)
+    function calculate_already_paid(){
+        let grand_total = parseFloat($("#grand_total").val());
+        let total_paid = parseFloat($("#total_paid").val());
+        
+        let remainder = grand_total - total_paid;
+        $("#remainder").val(remainder)
+
+        $(".cart-total-paid").html(showCurrency(total_paid.toFixed(2)));
+        $(".cart-remainder").html(showCurrency(remainder.toFixed(2)));
+
+        if(status=="payment"){
+            if(remainder > 0) {
+                $("#status").val("down payment");
+            } else {
+                $("#status").val("paid");
+            }
+        }
+    }
+
+    //calculate current paid (with new payments)
+    function calculate_current_paid(){
+        let total_paid = 0;
+        let grand_total = parseFloat($("#grand_total").val());
+        let already_paid = parseFloat($("#already_paid").val());
+        console.log(already_paid)
+        $(".paid-amount").each(function( index ) {
+            let paid = parseFloat($(this).val());
+            total_paid+=  isNaN(paid) ? 0 : paid; 
+        });
+        already_paid+=total_paid;
+        $("#total_paid").val(already_paid)
+        
+        calculate_already_paid();
     }
 
     function render_cart_number(){
         $(".cart-no").each(function( index ) {
             $( this ).html(index + 1);
         });
+        render_delete_item_btn()
+    }
+    function render_payment_number(){
+        $(".payment-no").each(function( index ) {
+            $( this ).html(index + 1);
+        });
+        render_delete_payment_btn()
     }
 
-    $("#btn-cash").click(function(){changePaymentAndStatus("cash")})
-    $("#btn-transfer").click(function(){changePaymentAndStatus("transfer")})
-    $("#btn-draft").click(function(){changePaymentAndStatus("draft")})
-
-    function changePaymentAndStatus(param){
-        if(param=="cash"){
-            $('#btn-cash').removeClass('btn-light').addClass('btn-primary');
-            $('#btn-transfer').removeClass('btn-primary').addClass('btn-light');
-            $('#btn-draft').removeClass('btn-primary').addClass('btn-light');
-            $("#transfer-proof-body").hide();
-            $("#payment_type").val(param);
-            $("#status").val("paid");
-        } else if(param=="transfer"){
-            $('#btn-cash').removeClass('btn-primary').addClass('btn-light');
-            $('#btn-transfer').removeClass('btn-light').addClass('btn-primary');
-            $('#btn-draft').removeClass('btn-primary').addClass('btn-light');
-            $("#transfer-proof-body").show();
-            $("#payment_type").val(param);
-            $("#status").val("paid");
-        } else {
-            $('#btn-cash').removeClass('btn-primary').addClass('btn-light');
-            $('#btn-transfer').removeClass('btn-primary').addClass('btn-light');
-            $('#btn-draft').removeClass('btn-light').addClass('btn-primary');
-            $("#transfer-proof-body").hide();
-            $("#payment_type").val("");
-            $("#status").val("unpaid");
+    function render_delete_item_btn(){
+        $(".btn-dlt-cart").show();
+        if($(".btn-dlt-cart").length == 1){
+            $(".btn-dlt-cart").hide();
         }
     }
+
+    function render_delete_payment_btn(){
+        $(".btn-dlt-payment").show();
+        if($(".btn-dlt-payment").length == 1){
+            $(".btn-dlt-payment").hide();
+        }
+    }
+
+    $("#btn-draft").click(function(){changePaymentAndStatus("draft")})
+    $("#btn-payment").click(function(){changePaymentAndStatus("payment")})
+
+    function changePaymentAndStatus(param){
+        if(param=="draft"){
+            status="draft";
+            $('#btn-payment').removeClass('btn-primary').addClass('btn-light');
+            $('#btn-draft').removeClass('btn-light').addClass('btn-primary');
+            $("#payment-wrap").hide();
+            $("#status").val("unpaid");
+            
+            //reset total paid & remainder
+            let total = parseFloat($("#grand_total").val());
+            $("#total_paid").val(0)
+            $("#remainder").val(total)
+            $(".cart-total-paid").html(showCurrency(0));
+            $(".cart-remainder").html(showCurrency(total.toFixed(2)));
+        } else if(param=="payment"){
+            status="payment";
+            $('#btn-draft').removeClass('btn-primary').addClass('btn-light');
+            $('#btn-payment').removeClass('btn-light').addClass('btn-primary');
+            $("#payment-wrap").show();
+
+            calculate_current_paid();
+        }
+    }
+
+    $("#form-tx").submit(function(e){
+        e.preventDefault();
+        $(".cart-qty").each(function(index){
+            check_stock(index);
+            change_discount(index);
+        })
+        $("#form-tx").submit();
+    })
+    render_delete_payment_btn();
+    render_delete_item_btn();
+    calculate_total();
 });

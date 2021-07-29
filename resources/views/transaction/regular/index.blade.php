@@ -96,6 +96,8 @@
                                     <td>
                                         @if($tx->status=="paid")
                                         <span class="badge badge-success">{{$tx->status}}</span>
+                                        @elseif($tx->status=="down payment")
+                                        <span class="badge badge-warning">{{$tx->status}}</span>
                                         @else
                                         <span class="badge badge-info">{{$tx->status}}</span>
                                         @endif
@@ -110,6 +112,8 @@
                                         <a href="{{route('tx.regular.draft', $tx)}}" class="btn btn-primary btn-icon">
                                             <i data-feather="edit"></i>
                                         </a>
+                                        @endif
+                                        @if($tx->status=="unpaid")
                                         <form class="frm-dlt-alert" action="{{route('tx.regular.delete', $tx)}}" method="post" style="display: inline-block;">
                                             @csrf
                                             <button type="button" class="btn-dlt-alert btn btn-danger btn-icon" data-title="Delete Draft Invoice" data-text="Are you sure you want to delete this draft invoice?">

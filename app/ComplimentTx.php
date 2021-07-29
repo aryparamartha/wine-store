@@ -21,20 +21,9 @@ class ComplimentTx extends Model
         'status',
         'payment_date',
         'payment_type',
-        'transfer_proof',
+        'total_paid',
+        'remainder',
     ];
-
-    public function getTransferProof(){
-        return self::$dir_photo . $this->transfer_proof;
-    }
-    
-    public function uploadPhoto($file, $filename){
-        $destinationPath = public_path(self::$dir_photo);
-        $img = Image::make($file);
-        $img->resize(null, 500, function ($constraint) {
-            $constraint->aspectRatio();
-        })->save($destinationPath. '/'. $filename);
-    }
 
     public function showCurrency($n){
         return "Rp".number_format($n, 2, ",", ".");
@@ -80,5 +69,10 @@ class ComplimentTx extends Model
     public function detail()
     {
         return $this->hasMany('App\DetComplTx');
+    }
+
+    public function payment_logs()
+    {
+        return $this->morphMany('App\TxPaymentLog', 'logable');
     }
 }

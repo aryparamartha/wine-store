@@ -69,29 +69,69 @@
             </td>
         </tr>
         `;
+
+    var paymentTemplate = `
+        <div class="col-md-12">
+            <div class="form-group border-bottom">
+                <div class="row">
+                    <div class="col-md-12 pb-2">
+                        <label for="payment_id">Payment <span class="payment-no">1</span></label>
+                        <button type="button" style="float:right" class="btn-dlt-payment btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <input value="{{$payment_types[0]->name}}" type="hidden" name="payment_name[]" class="payment-name"/>
+                        <select name="payment_id[]" class="select-payment-id w-100 form-control">
+                            @foreach($payment_types as $payment)
+                            <option value="{{$payment->id}}">{{$payment->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6 pb-2">
+                        <input type="text" class="paid-amount form-control" name="paid_amount[]">
+                    </div>
+                    <div class="col-md-12 transfer-proof-body" style="display:none">
+                        <div class="form-group">
+                            <input type="file" name="payment_proof[]" class="file-upload-default">
+                            <div class="input-group col-xs-12">
+                                <input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Proof">
+                                <span class="input-group-append">
+                                    <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    $(function() {
+        $("#total").val(0)
+        $("#_tax").val(0)
+        $("#tax").val(0)
+        $("#grand_total").val(0)
+        $("#total_paid").val(0)
+        $("#remainder").val(0)
+        $("#already_paid").val(0)
+        $("#status").val("unpaid")
+    })
 </script>
 @endsection
 
 @section('content')
-<form name="memberForm" class="forms-sample" action="{{route('tx.compliment.store')}}" method="POST" enctype='multipart/form-data'>
+<form id="form-tx" class="forms-sample" action="{{route('tx.compliment.store')}}" method="POST" enctype='multipart/form-data'>
     @csrf
 <div class="page-content">
     <div class="row">
-        <div class="col-md-3 grid-margin">
+        <div class="col-md-4 grid-margin">
             <div class="row">
                 <div class="col-md-12 grid-margin">
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title">New Surat Jalan</h4>
                             <div class="row">
-                                <!--
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="name">Invoice ID</label>
-                                        <input type="text" class="form-control" id="nama_pegawai" name="nama_pegawai" placeholder="Putra Dinata" value="" required autofocus>
-                                    </div>
-                                </div>
-                                -->
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="customer_id" class="w-100">Customer</label>
@@ -125,42 +165,91 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="name">Total</label>
+                                        <label for="name">Grand Total</label>
                                         <h3 class="cart-total text-right">Rp0</h3>
                                         <input type="hidden" id="total" name="total" value="0">
+                                        <input type="hidden" id="_tax" value="0">
                                         <input type="hidden" id="tax" name="tax" value="0">
                                         <input type="hidden" id="grand_total" name="grand_total" value="0">
+                                        <input type="hidden" id="total_paid" name="total_paid" value="0">
+                                        <input type="hidden" id="remainder" name="remainder" value="0">
+                                        <input type="hidden" id="already_paid" name="already_paid" value="0">
                                     </div>
                                 </div>
                                 <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="name">Total Paid</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5 class="cart-total-paid text-right">Rp0</h5>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="name">Remainder</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <h5 class="cart-remainder text-right">Rp0</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
                                     <div class="form-group">
                                     <button type="button" id="btn-draft" class="btn btn-primary mr-2 w-100">Keep Open</button>
                                     </div>
                                 </div>
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <div class="form-group">
-                                    <button type="button" id="btn-cash" class="btn btn-light mr-2 w-100">Cash</button>
+                                    <button type="button" id="btn-payment" class="btn btn-light mr-2 w-100">Payment</button>
                                     </div>
                                 </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                    <button type="button" id="btn-transfer" class="btn btn-light mr-2 w-100">Transfer</button>
+                                <div id="payment-wrap" style="display:none">
+                                    <div id="payment-body">
+                                        <div class="col-md-12">
+                                            <div class="form-group border-bottom">
+                                                <div class="row">
+                                                    <div class="col-md-12 pb-2">
+                                                        <label for="payment_id">Payment <span class="payment-no">1</span></label>
+                                                        <button type="button" style="float:right" class="btn-dlt-payment btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
+                                                            <i data-feather="trash"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input value="{{$payment_types[0]->name}}" type="hidden" name="payment_name[]" class="payment-name"/>
+                                                        <select name="payment_id[]" class="select-payment-id w-100 form-control">
+                                                            @foreach($payment_types as $payment)
+                                                            <option value="{{$payment->id}}">{{$payment->name}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6 pb-2">
+                                                        <input type="text" class="paid-amount form-control" name="paid_amount[]">
+                                                    </div>
+                                                    <div class="col-md-12 transfer-proof-body" style="display:none">
+                                                        <div class="form-group">
+                                                            <input type="file" name="payment_proof[]" class="file-upload-default">
+                                                            <div class="input-group col-xs-12">
+                                                                <input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Proof">
+                                                                <span class="input-group-append">
+                                                                    <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                        <button type="button" id="btn-add-payment" class="btn btn-secondary mr-2 w-100">Add Payment</button>
+                                        </div>
                                     </div>
                                 </div>
-                                <input type="hidden" id="payment_type" name="payment_type" value="" />
                                 <input type="hidden" id="status" name="status" value="unpaid" />
-                                <div id="transfer-proof-body" class="col-md-12" style="display: none !important">
-									<div class="form-group">
-										<label>Upload Transfer Proof</label>
-										<input type="file" name="tf_proof" class="file-upload-default">
-										<div class="input-group col-xs-12">
-											<input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Image">
-											<span class="input-group-append">
-												<button class="file-upload-browse btn btn-primary" type="button">Upload</button>
-											</span>
-										</div>
-									</div>
-                                </div>
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-success mr-2 w-100">Submit</button>
@@ -172,7 +261,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-9 grid-margin stretch-card">
+        <div class="col-md-8 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Items</h4>
@@ -199,14 +288,14 @@
                                                 <input type="hidden" name="goods_id[]" class="cart-goods-id" />
                                                 <input type="hidden" name="unit_id[]" class="cart-unit-id" />
                                                 <input type="hidden" name="sub_total[]" class="cart-sub-total-input" />
-                                                <select class="cart-goods select-goods form-control" style="width:100% !important" required>
+                                                <select class="cart-goods select-goods form-control" style="width:100% !important">
                                                     <option></option>
                                                     @foreach($goods as $good)
                                                     <option value="{{$good}}">{{$good->code}} - {{$good->name}}</option>
                                                     @endforeach
                                                 </select>
                                             </td>
-                                            <td><input type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value="" required autofocus></td>
+                                            <td><input type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value=""></td>
                                             <td class="cart-unit"></td>
                                             <td><input type="text" class="cart-price form-control" name="price[]" /></td>
                                             <td>

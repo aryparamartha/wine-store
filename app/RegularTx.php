@@ -5,11 +5,10 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 use Carbon;
-use Image;
+use Eloquent;
 
-class RegularTx extends Model
+class RegularTx extends Eloquent 
 {   
-    public static $dir_photo = "/uploads/transaction/regular/";
     protected $fillable = [
         'invoice_id',
         'employee_id',
@@ -21,20 +20,9 @@ class RegularTx extends Model
         'status',
         'payment_date',
         'payment_type',
-        'transfer_proof',
+        'total_paid',
+        'remainder',
     ];
-
-    public function getTransferProof(){
-        return self::$dir_photo . $this->transfer_proof;
-    }
-    
-    public function uploadPhoto($file, $filename){
-        $destinationPath = public_path(self::$dir_photo);
-        $img = Image::make($file);
-        $img->resize(null, 500, function ($constraint) {
-            $constraint->aspectRatio();
-        })->save($destinationPath. '/'. $filename);
-    }
 
     public function showCurrency($n){
         return "Rp".number_format($n, 2, ",", ".");
@@ -79,5 +67,10 @@ class RegularTx extends Model
     public function detail()
     {
         return $this->hasMany('App\DetRegTx');
+    }
+
+    public function payment_logs()
+    {
+        return $this->morphMany('App\TxPaymentLog', 'logable');
     }
 }

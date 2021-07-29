@@ -41,27 +41,6 @@ LOCK TABLES `breakages` WRITE;
 
 UNLOCK TABLES;
 
-/*Table structure for table `company_profile` */
-
-DROP TABLE IF EXISTS `company_profile`;
-
-CREATE TABLE `company_profile` (
-  `id` tinyint(4) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) DEFAULT NULL,
-  `address` text,
-  `phone` varchar(20) DEFAULT NULL,
-  `email` varchar(50) DEFAULT NULL,
-  `website` varchar(50) DEFAULT NULL,
-  `logo` text,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-/*Data for the table `company_profile` */
-
-LOCK TABLES `company_profile` WRITE;
-
-UNLOCK TABLES;
-
 /*Table structure for table `company_profiles` */
 
 DROP TABLE IF EXISTS `company_profiles`;
@@ -74,6 +53,8 @@ CREATE TABLE `company_profiles` (
   `email` varchar(50) DEFAULT NULL,
   `website` varchar(50) DEFAULT NULL,
   `logo` text,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
@@ -81,7 +62,7 @@ CREATE TABLE `company_profiles` (
 
 LOCK TABLES `company_profiles` WRITE;
 
-insert  into `company_profiles`(`id`,`name`,`address`,`phone`,`email`,`website`,`logo`) values (1,'Wine Project','Jl. Sunset Road No XX','(0361)-412-423','wineproj@email.com','wineproj.co.id','assets\\images\\logo\\wine-logo.png');
+insert  into `company_profiles`(`id`,`name`,`address`,`phone`,`email`,`website`,`logo`,`created_at`,`updated_at`) values (1,'Wine Projects','Jl. Sunset Road No XXs','(0361)-412-423s','wineproj@email.coms','wineproj.co.ids','company_logo.JPG',NULL,'2021-07-21 18:33:32');
 
 UNLOCK TABLES;
 
@@ -98,10 +79,11 @@ CREATE TABLE `compliment_txes` (
   `total` double DEFAULT NULL,
   `tax` double DEFAULT NULL,
   `grand_total` double DEFAULT NULL,
-  `status` enum('paid','unpaid') DEFAULT NULL,
+  `status` enum('paid','unpaid','down payment') DEFAULT NULL,
   `payment_date` timestamp NULL DEFAULT NULL,
-  `payment_type` enum('cash','transfer') DEFAULT NULL,
-  `transfer_proof` text,
+  `payment_type` varchar(50) DEFAULT NULL,
+  `total_paid` double DEFAULT NULL,
+  `remainder` double DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -110,13 +92,13 @@ CREATE TABLE `compliment_txes` (
   KEY `client_id` (`customer_id`),
   CONSTRAINT `compliment_txes_ibfk_2` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`),
   CONSTRAINT `compliment_txes_ibfk_3` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 
 /*Data for the table `compliment_txes` */
 
 LOCK TABLES `compliment_txes` WRITE;
 
-insert  into `compliment_txes`(`id`,`invoice_id`,`employee_id`,`customer_id`,`seller_id`,`total`,`tax`,`grand_total`,`status`,`payment_date`,`payment_type`,`transfer_proof`,`created_at`,`updated_at`) values (1,'C21072002190001',1,1,NULL,45000,4500,49500,'unpaid',NULL,NULL,NULL,'2021-07-19 18:19:09','2021-07-19 18:19:09'),(2,'C21072002550002',1,1,NULL,47000,4700,51700,'unpaid',NULL,NULL,NULL,'2021-07-19 18:55:25','2021-07-19 18:55:25'),(3,'C21072002570003',1,1,NULL,49000,4900,53900,'unpaid',NULL,NULL,NULL,'2021-07-19 18:57:17','2021-07-19 18:57:17');
+insert  into `compliment_txes`(`id`,`invoice_id`,`employee_id`,`customer_id`,`seller_id`,`total`,`tax`,`grand_total`,`status`,`payment_date`,`payment_type`,`total_paid`,`remainder`,`created_at`,`updated_at`) values (2,'C21073003320001',1,1,NULL,450000,0,450000,'paid','2021-07-29 19:36:40','Cash, Transfer',450000,0,'2021-07-29 19:32:15','2021-07-29 19:36:40');
 
 UNLOCK TABLES;
 
@@ -171,13 +153,11 @@ CREATE TABLE `det_compl_txes` (
   CONSTRAINT `det_compl_txes_ibfk_1` FOREIGN KEY (`compliment_tx_id`) REFERENCES `compliment_txes` (`id`),
   CONSTRAINT `det_compl_txes_ibfk_2` FOREIGN KEY (`goods_id`) REFERENCES `goods` (`id`),
   CONSTRAINT `det_compl_txes_ibfk_3` FOREIGN KEY (`unit_id`) REFERENCES `units` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 
 /*Data for the table `det_compl_txes` */
 
 LOCK TABLES `det_compl_txes` WRITE;
-
-insert  into `det_compl_txes`(`id`,`compliment_tx_id`,`goods_id`,`qty`,`unit_id`,`disc`,`price`,`sub_total`,`created_at`,`updated_at`) values (1,1,25,1,2,10,10000,9000,'2021-07-19 18:19:09','2021-07-19 18:19:09'),(2,1,26,2,1,10,20000,36000,'2021-07-19 18:19:09','2021-07-19 18:19:09'),(3,2,25,1,2,10,10000,9000,'2021-07-19 18:55:25','2021-07-19 18:55:25'),(4,2,26,2,1,5,20000,38000,'2021-07-19 18:55:25','2021-07-19 18:55:25'),(5,3,25,1,2,10,10000,9000,'2021-07-19 18:57:17','2021-07-19 18:57:17'),(6,3,26,2,1,0,20000,40000,'2021-07-19 18:57:17','2021-07-19 18:57:17');
 
 UNLOCK TABLES;
 
@@ -207,8 +187,6 @@ CREATE TABLE `det_receivings` (
 
 LOCK TABLES `det_receivings` WRITE;
 
-insert  into `det_receivings`(`id`,`receiving_id`,`goods_id`,`qty`,`unit_id`,`price`,`sub_total`,`tax`,`created_at`,`updated_at`) values (21,6,25,1,2,123,123,NULL,'2021-07-18 15:53:29','2021-07-18 15:53:29'),(22,6,26,3,1,123,369,NULL,'2021-07-18 15:53:29','2021-07-18 15:53:29');
-
 UNLOCK TABLES;
 
 /*Table structure for table `det_reg_txes` */
@@ -233,13 +211,11 @@ CREATE TABLE `det_reg_txes` (
   CONSTRAINT `det_reg_txes_ibfk_1` FOREIGN KEY (`regular_tx_id`) REFERENCES `regular_txes` (`id`),
   CONSTRAINT `det_reg_txes_ibfk_2` FOREIGN KEY (`goods_id`) REFERENCES `goods` (`id`),
   CONSTRAINT `det_reg_txes_ibfk_3` FOREIGN KEY (`unit_id`) REFERENCES `units` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=latin1;
 
 /*Data for the table `det_reg_txes` */
 
 LOCK TABLES `det_reg_txes` WRITE;
-
-insert  into `det_reg_txes`(`id`,`regular_tx_id`,`goods_id`,`qty`,`unit_id`,`disc`,`price`,`sub_total`,`created_at`,`updated_at`) values (5,16,25,1,2,NULL,15000,15000,'2021-07-18 07:38:50','2021-07-18 07:38:50'),(6,16,26,2,1,NULL,30000,60000,'2021-07-18 07:38:50','2021-07-18 07:38:50'),(7,18,25,10,2,NULL,15000,150000,'2021-07-18 07:57:21','2021-07-18 07:57:21'),(8,18,26,20,1,NULL,30000,600000,'2021-07-18 07:57:21','2021-07-18 07:57:21'),(9,19,25,1,2,NULL,15000,15000,'2021-07-19 16:24:04','2021-07-19 16:24:04'),(10,19,25,2,2,NULL,15000,30000,'2021-07-19 16:24:04','2021-07-19 16:24:04'),(11,20,25,1,2,10,10000,9000,'2021-07-19 18:45:38','2021-07-19 18:45:38'),(12,20,26,2,1,20,20000,32000,'2021-07-19 18:45:38','2021-07-19 18:45:38'),(15,21,25,1,2,10,10000,9000,'2021-07-19 18:51:51','2021-07-19 18:51:51'),(16,21,26,2,1,20,20000,32000,'2021-07-19 18:51:51','2021-07-19 18:51:51');
 
 UNLOCK TABLES;
 
@@ -297,7 +273,7 @@ CREATE TABLE `goods` (
 
 LOCK TABLES `goods` WRITE;
 
-insert  into `goods`(`id`,`code`,`name`,`unit_id`,`amount`,`purchase_price`,`selling_price`,`tax_price`,`added_by`,`created_at`,`updated_at`,`deleted_at`) values (25,'WP001','Wine Premium 1',2,89,10000,15000,13636.37,1,'2021-07-18 05:46:56','2021-07-19 18:45:38',NULL),(26,'WP002','Wine Premium 2',1,29,20000,30000,27272.73,1,'2021-07-18 07:19:45','2021-07-19 18:45:38',NULL);
+insert  into `goods`(`id`,`code`,`name`,`unit_id`,`amount`,`purchase_price`,`selling_price`,`tax_price`,`added_by`,`created_at`,`updated_at`,`deleted_at`) values (25,'WP001','Wine Premium 1',2,100,10000,15000,13636.37,1,'2021-07-18 05:46:56','2021-07-29 19:32:15',NULL),(26,'WP002','Wine Premium 2',1,50,20000,30000,27272.73,1,'2021-07-18 07:19:45','2021-07-29 19:32:15',NULL);
 
 UNLOCK TABLES;
 
@@ -318,13 +294,33 @@ CREATE TABLE `goods_logs` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=latin1;
 
 /*Data for the table `goods_logs` */
 
 LOCK TABLES `goods_logs` WRITE;
 
-insert  into `goods_logs`(`id`,`goods_id`,`status`,`date`,`qty`,`post_amount`,`price`,`source`,`note`,`created_at`,`updated_at`) values (2,25,'IN','2021-07-18 05:46:56',100,100,0,'First Register',NULL,'2021-07-18 05:46:56','2021-07-18 05:46:56'),(3,26,'IN','2021-07-18 07:19:45',50,50,0,'First Register',NULL,'2021-07-18 07:19:45','2021-07-18 07:19:45'),(6,25,'OUT','2021-07-18 07:38:50',1,99,15000,'Comp1',NULL,'2021-07-18 07:38:50','2021-07-18 07:38:50'),(7,26,'OUT','2021-07-18 07:38:50',2,48,60000,'Comp1',NULL,'2021-07-18 07:38:50','2021-07-18 07:38:50'),(8,25,'OUT','2021-07-18 07:57:21',10,89,150000,'Personal1',NULL,'2021-07-18 07:57:21','2021-07-18 07:57:21'),(9,26,'OUT','2021-07-18 07:57:21',20,28,600000,'Personal1',NULL,'2021-07-18 07:57:21','2021-07-18 07:57:21'),(24,25,'IN','2021-07-18 15:35:46',11,100,1,'Supplier1',NULL,'2021-07-18 15:35:46','2021-07-18 15:35:46'),(25,26,'IN','2021-07-18 15:35:46',12,40,1,'Supplier1',NULL,'2021-07-18 15:35:46','2021-07-18 15:35:46'),(26,25,'OUT','2021-07-18 15:39:07',11,89,1,'Supplier1',NULL,'2021-07-18 15:39:07','2021-07-18 15:39:07'),(27,26,'OUT','2021-07-18 15:39:07',12,28,1,'Supplier1',NULL,'2021-07-18 15:39:07','2021-07-18 15:39:07'),(28,25,'IN','2021-07-18 15:39:07',6,95,1,'Supplier1',NULL,'2021-07-18 15:39:07','2021-07-18 15:39:07'),(29,26,'IN','2021-07-18 15:39:07',7,35,1,'Supplier1',NULL,'2021-07-18 15:39:07','2021-07-18 15:39:07'),(30,25,'OUT','2021-07-18 15:43:35',6,89,1,'Supplier1','Delete receiving','2021-07-18 15:43:35','2021-07-18 15:43:35'),(31,26,'OUT','2021-07-18 15:43:35',7,28,1,'Supplier1','Delete receiving','2021-07-18 15:43:35','2021-07-18 15:43:35'),(32,25,'IN','2021-07-18 15:43:35',1,90,1,'Supplier1',NULL,'2021-07-18 15:43:35','2021-07-18 15:43:35'),(33,26,'IN','2021-07-18 15:43:35',2,30,1,'Supplier1',NULL,'2021-07-18 15:43:35','2021-07-18 15:43:35'),(36,25,'OUT','2021-07-18 15:45:27',1,89,1,'Supplier1','Delete receiving','2021-07-18 15:45:27','2021-07-18 15:45:27'),(37,26,'OUT','2021-07-18 15:45:27',2,28,1,'Supplier1','Delete receiving','2021-07-18 15:45:27','2021-07-18 15:45:27'),(38,25,'IN','2021-07-18 15:52:50',1,90,123,'Supplier1',NULL,'2021-07-18 15:52:50','2021-07-18 15:52:50'),(39,26,'IN','2021-07-18 15:52:50',2,30,246,'Supplier1',NULL,'2021-07-18 15:52:50','2021-07-18 15:52:50'),(40,25,'OUT','2021-07-18 15:53:29',1,89,123,'Supplier1','Delete receiving','2021-07-18 15:53:29','2021-07-18 15:53:29'),(41,26,'OUT','2021-07-18 15:53:29',2,28,246,'Supplier1','Delete receiving','2021-07-18 15:53:29','2021-07-18 15:53:29'),(42,25,'IN','2021-07-18 15:53:29',1,90,123,'Supplier1',NULL,'2021-07-18 15:53:29','2021-07-18 15:53:29'),(43,26,'IN','2021-07-18 15:53:29',3,31,369,'Supplier1',NULL,'2021-07-18 15:53:29','2021-07-18 15:53:29'),(44,25,'OUT','2021-07-19 18:45:38',1,89,9000,'Personal1',NULL,'2021-07-19 18:45:38','2021-07-19 18:45:38'),(45,26,'OUT','2021-07-19 18:45:38',2,29,32000,'Personal1',NULL,'2021-07-19 18:45:38','2021-07-19 18:45:38');
+insert  into `goods_logs`(`id`,`goods_id`,`status`,`date`,`qty`,`post_amount`,`price`,`source`,`note`,`created_at`,`updated_at`) values (64,25,'IN','2021-07-30 03:28:58',100,100,NULL,'First Incoming',NULL,NULL,NULL),(65,26,'IN','2021-07-29 19:30:00',50,50,NULL,'Fist Incoming',NULL,'2021-07-29 19:30:00','2021-07-29 19:30:00');
+
+UNLOCK TABLES;
+
+/*Table structure for table `payment_types` */
+
+DROP TABLE IF EXISTS `payment_types`;
+
+CREATE TABLE `payment_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
+/*Data for the table `payment_types` */
+
+LOCK TABLES `payment_types` WRITE;
+
+insert  into `payment_types`(`id`,`name`,`created_at`,`updated_at`) values (1,'Cash','2021-07-25 14:23:10','0000-00-00 00:00:00'),(2,'Transfer','2021-07-25 14:23:14','0000-00-00 00:00:00'),(3,'Credit Card','2021-07-25 14:23:18','0000-00-00 00:00:00');
 
 UNLOCK TABLES;
 
@@ -352,8 +348,6 @@ CREATE TABLE `receivings` (
 
 LOCK TABLES `receivings` WRITE;
 
-insert  into `receivings`(`id`,`invoice_id`,`employee_id`,`supplier_id`,`grand_total`,`receiving_date`,`created_at`,`updated_at`) values (6,'RCV21071201040001',1,1,492,'2021-07-18','2021-07-18 15:52:50','2021-07-18 15:53:29');
-
 UNLOCK TABLES;
 
 /*Table structure for table `regular_txes` */
@@ -369,10 +363,11 @@ CREATE TABLE `regular_txes` (
   `total` double DEFAULT NULL,
   `tax` double DEFAULT NULL,
   `grand_total` double DEFAULT NULL,
-  `status` enum('paid','unpaid') DEFAULT NULL,
+  `status` enum('paid','unpaid','down payment') DEFAULT NULL,
   `payment_date` timestamp NULL DEFAULT NULL,
-  `payment_type` enum('cash','transfer') DEFAULT NULL,
-  `transfer_proof` text,
+  `payment_type` varchar(50) DEFAULT NULL,
+  `total_paid` double DEFAULT NULL,
+  `remainder` double DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -381,13 +376,13 @@ CREATE TABLE `regular_txes` (
   KEY `company_id` (`customer_id`),
   CONSTRAINT `regular_txes_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`),
   CONSTRAINT `regular_txes_ibfk_2` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=latin1;
 
 /*Data for the table `regular_txes` */
 
 LOCK TABLES `regular_txes` WRITE;
 
-insert  into `regular_txes`(`id`,`invoice_id`,`employee_id`,`customer_id`,`seller_id`,`total`,`tax`,`grand_total`,`status`,`payment_date`,`payment_type`,`transfer_proof`,`created_at`,`updated_at`) values (16,'R21071815380001',1,2,NULL,75000,6818.18,75000,'paid','2021-07-18 07:38:50','cash',NULL,'2021-07-18 07:38:50','2021-07-18 07:38:50'),(18,'R21071815570002',1,1,NULL,750000,68181.82,750000,'paid','2021-07-18 07:57:21','cash',NULL,'2021-07-18 07:57:21','2021-07-18 07:57:21'),(19,'R21072000240001',1,1,1,45000,4090.91,45000,'unpaid',NULL,NULL,NULL,'2021-07-19 16:24:04','2021-07-19 16:24:04'),(20,'R21072002450002',1,1,NULL,41000,4100,45100,'paid','2021-07-19 18:45:38','cash',NULL,'2021-07-19 18:45:38','2021-07-19 18:45:38'),(21,'R21072002510003',1,1,NULL,41000,4100,45100,'unpaid',NULL,NULL,NULL,'2021-07-19 18:51:21','2021-07-19 18:51:51');
+insert  into `regular_txes`(`id`,`invoice_id`,`employee_id`,`customer_id`,`seller_id`,`total`,`tax`,`grand_total`,`status`,`payment_date`,`payment_type`,`total_paid`,`remainder`,`created_at`,`updated_at`) values (54,'R21073003300001',1,1,NULL,1000000,100000,1100000,'paid','2021-07-29 19:31:24','Cash, Transfer, Credit Card',1100000,0,'2021-07-29 19:30:00','2021-07-29 19:31:24'),(55,'R21073003310002',1,1,NULL,900000,90000,990000,'unpaid',NULL,NULL,0,990000,'2021-07-29 19:31:00','2021-07-29 19:31:00');
 
 UNLOCK TABLES;
 
@@ -436,6 +431,31 @@ CREATE TABLE `suppliers` (
 LOCK TABLES `suppliers` WRITE;
 
 insert  into `suppliers`(`id`,`name`,`address`,`number`,`email`,`pic`,`created_at`,`updated_at`) values (1,'Supplier1','Jln. Nangka Utara 1','442135','supplier@default.com',1,'2021-07-04 15:40:40','2021-07-04 15:40:40');
+
+UNLOCK TABLES;
+
+/*Table structure for table `tx_payment_logs` */
+
+DROP TABLE IF EXISTS `tx_payment_logs`;
+
+CREATE TABLE `tx_payment_logs` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `tx_id` int(11) DEFAULT NULL,
+  `payment_type_id` int(11) DEFAULT NULL,
+  `paid_amount` double DEFAULT NULL,
+  `tx_type` tinyint(1) DEFAULT NULL COMMENT '0=suratjalan, 1=regular',
+  `pic` int(11) DEFAULT NULL,
+  `payment_proof` varchar(50) DEFAULT NULL,
+  `logable_id` int(11) DEFAULT NULL,
+  `logable_type` varchar(20) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=latin1;
+
+/*Data for the table `tx_payment_logs` */
+
+LOCK TABLES `tx_payment_logs` WRITE;
 
 UNLOCK TABLES;
 
