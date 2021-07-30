@@ -134,7 +134,9 @@ $(function() {
                 showConfirmButton: true
             });
             $(".cart-qty").eq(index).val("")
+            return false;
         }
+        return true;
     }
 
     function change_qty(){
@@ -283,13 +285,19 @@ $(function() {
         }
     }
 
-    $("#form-tx").submit(function(e){
+    $("#form-tx").on("submit", function(e){
         e.preventDefault();
+        let stock_valid = true;
         $(".cart-qty").each(function(index){
-            check_stock(index);
+            if(!check_stock(index)) {
+                stock_valid = false;
+            }
             change_discount(index);
-        })
-        $("#form-tx").submit();
+        }) 
+        if(stock_valid){
+            $(this).unbind();
+            $(this).submit();
+        }
     })
     render_delete_payment_btn();
     render_delete_item_btn();

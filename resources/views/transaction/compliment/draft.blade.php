@@ -290,7 +290,7 @@
                                 <input type="hidden" id="status" name="status" value="{{$tx->status}}" />
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <button type="submit" class="btn btn-success mr-2 w-100">Submit</button>
+                                        <button id="btn-submit" type="button" class="btn btn-success mr-2 w-100">Submit</button>
                                     </div>
                                 </div>
                             </div>
