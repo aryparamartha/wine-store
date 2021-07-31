@@ -33,11 +33,13 @@ CREATE TABLE `breakages` (
   KEY `created_by` (`created_by`),
   CONSTRAINT `breakages_ibfk_1` FOREIGN KEY (`goods_id`) REFERENCES `goods` (`id`),
   CONSTRAINT `breakages_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `employees` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 
 /*Data for the table `breakages` */
 
 LOCK TABLES `breakages` WRITE;
+
+insert  into `breakages`(`id`,`goods_id`,`reason`,`qty`,`created_by`,`created_at`,`updated_at`) values (1,25,'break',1,1,'2021-07-30 13:11:29','2021-07-30 13:11:29'),(5,25,'test',1,1,'2021-07-30 20:02:39','2021-07-30 20:02:39');
 
 UNLOCK TABLES;
 
@@ -92,13 +94,11 @@ CREATE TABLE `compliment_txes` (
   KEY `client_id` (`customer_id`),
   CONSTRAINT `compliment_txes_ibfk_2` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`),
   CONSTRAINT `compliment_txes_ibfk_3` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Data for the table `compliment_txes` */
 
 LOCK TABLES `compliment_txes` WRITE;
-
-insert  into `compliment_txes`(`id`,`invoice_id`,`employee_id`,`customer_id`,`seller_id`,`total`,`tax`,`grand_total`,`status`,`payment_date`,`payment_type`,`total_paid`,`remainder`,`created_at`,`updated_at`) values (2,'C21073003320001',1,1,NULL,450000,0,450000,'paid','2021-07-29 19:36:40','Cash, Transfer',450000,0,'2021-07-29 19:32:15','2021-07-29 19:36:40');
 
 UNLOCK TABLES;
 
@@ -153,7 +153,7 @@ CREATE TABLE `det_compl_txes` (
   CONSTRAINT `det_compl_txes_ibfk_1` FOREIGN KEY (`compliment_tx_id`) REFERENCES `compliment_txes` (`id`),
   CONSTRAINT `det_compl_txes_ibfk_2` FOREIGN KEY (`goods_id`) REFERENCES `goods` (`id`),
   CONSTRAINT `det_compl_txes_ibfk_3` FOREIGN KEY (`unit_id`) REFERENCES `units` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Data for the table `det_compl_txes` */
 
@@ -181,7 +181,7 @@ CREATE TABLE `det_receivings` (
   KEY `receiving_id` (`receiving_id`),
   CONSTRAINT `det_receivings_ibfk_2` FOREIGN KEY (`goods_id`) REFERENCES `goods` (`id`),
   CONSTRAINT `det_receivings_ibfk_3` FOREIGN KEY (`receiving_id`) REFERENCES `receivings` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Data for the table `det_receivings` */
 
@@ -211,7 +211,7 @@ CREATE TABLE `det_reg_txes` (
   CONSTRAINT `det_reg_txes_ibfk_1` FOREIGN KEY (`regular_tx_id`) REFERENCES `regular_txes` (`id`),
   CONSTRAINT `det_reg_txes_ibfk_2` FOREIGN KEY (`goods_id`) REFERENCES `goods` (`id`),
   CONSTRAINT `det_reg_txes_ibfk_3` FOREIGN KEY (`unit_id`) REFERENCES `units` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1;
 
 /*Data for the table `det_reg_txes` */
 
@@ -273,7 +273,7 @@ CREATE TABLE `goods` (
 
 LOCK TABLES `goods` WRITE;
 
-insert  into `goods`(`id`,`code`,`name`,`unit_id`,`amount`,`purchase_price`,`selling_price`,`tax_price`,`added_by`,`created_at`,`updated_at`,`deleted_at`) values (25,'WP001','Wine Premium 1',2,100,10000,15000,13636.37,1,'2021-07-18 05:46:56','2021-07-29 19:32:15',NULL),(26,'WP002','Wine Premium 2',1,50,20000,30000,27272.73,1,'2021-07-18 07:19:45','2021-07-29 19:32:15',NULL);
+insert  into `goods`(`id`,`code`,`name`,`unit_id`,`amount`,`purchase_price`,`selling_price`,`tax_price`,`added_by`,`created_at`,`updated_at`,`deleted_at`) values (25,'WP001','Wine Premium 1',2,100,10000,15000,13636.37,1,'2021-07-18 05:46:56','2021-07-30 13:02:47',NULL),(26,'WP002','Wine Premium 2',1,50,20000,30000,27272.73,1,'2021-07-18 07:19:45','2021-07-30 13:02:47',NULL);
 
 UNLOCK TABLES;
 
@@ -291,16 +291,18 @@ CREATE TABLE `goods_logs` (
   `price` double DEFAULT NULL,
   `source` text,
   `note` text,
+  `logable_id` int(11) DEFAULT NULL,
+  `logable_type` varchar(20) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=latin1;
 
 /*Data for the table `goods_logs` */
 
 LOCK TABLES `goods_logs` WRITE;
 
-insert  into `goods_logs`(`id`,`goods_id`,`status`,`date`,`qty`,`post_amount`,`price`,`source`,`note`,`created_at`,`updated_at`) values (64,25,'IN','2021-07-30 03:28:58',100,100,NULL,'First Incoming',NULL,NULL,NULL),(65,26,'IN','2021-07-29 19:30:00',50,50,NULL,'Fist Incoming',NULL,'2021-07-29 19:30:00','2021-07-29 19:30:00');
+insert  into `goods_logs`(`id`,`goods_id`,`status`,`date`,`qty`,`post_amount`,`price`,`source`,`note`,`logable_id`,`logable_type`,`created_at`,`updated_at`) values (64,25,'IN','2021-07-30 03:28:58',100,100,NULL,'First Incoming',NULL,NULL,NULL,NULL,NULL),(65,26,'IN','2021-07-29 19:30:00',50,50,NULL,'Fist Incoming',NULL,NULL,NULL,'2021-07-29 19:30:00','2021-07-29 19:30:00');
 
 UNLOCK TABLES;
 
@@ -342,7 +344,7 @@ CREATE TABLE `receivings` (
   KEY `employee_id` (`employee_id`),
   CONSTRAINT `receivings_ibfk_1` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`),
   CONSTRAINT `receivings_ibfk_2` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Data for the table `receivings` */
 
@@ -376,13 +378,11 @@ CREATE TABLE `regular_txes` (
   KEY `company_id` (`customer_id`),
   CONSTRAINT `regular_txes_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`),
   CONSTRAINT `regular_txes_ibfk_2` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=latin1;
 
 /*Data for the table `regular_txes` */
 
 LOCK TABLES `regular_txes` WRITE;
-
-insert  into `regular_txes`(`id`,`invoice_id`,`employee_id`,`customer_id`,`seller_id`,`total`,`tax`,`grand_total`,`status`,`payment_date`,`payment_type`,`total_paid`,`remainder`,`created_at`,`updated_at`) values (54,'R21073003300001',1,1,NULL,1000000,100000,1100000,'paid','2021-07-29 19:31:24','Cash, Transfer, Credit Card',1100000,0,'2021-07-29 19:30:00','2021-07-29 19:31:24'),(55,'R21073003310002',1,1,NULL,900000,90000,990000,'unpaid',NULL,NULL,0,990000,'2021-07-29 19:31:00','2021-07-29 19:31:00');
 
 UNLOCK TABLES;
 
@@ -451,7 +451,7 @@ CREATE TABLE `tx_payment_logs` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 
 /*Data for the table `tx_payment_logs` */
 

@@ -63,6 +63,10 @@
             $('#goods_id').val(breakage.goods_id).trigger('change');
             $('#qty').val(breakage.qty);
             $('#reason').val(breakage.reason);
+
+            $('#_goods_id').val(breakage.goods_id);
+            $('#_qty').val(breakage.qty);
+            $('#_reason').val(breakage.reason);
         });
 
         $(".btn-dlt-alert").click(function(event){
@@ -168,7 +172,7 @@
 {{-- Modal --}}
 <div class="modal fade" id="breakage-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">        
+        <div class="modal-content">
         <form id="breakage-form" class="forms-sample" action="" method="POST">
             @csrf
             <div class="modal-header">
@@ -181,20 +185,23 @@
                 <input type="hidden" name="id" id="id">
                 <div class="form-group">
                     <label for="goods_id" class="w-100">Product</label>
+                    <input type="hidden" id="_goods_id" name="_goods_id"/>
                     <select id="goods_id" name="goods_id" class="select2 form-control" required>
                         <option></option>
                         @foreach($goods as $good)
                         <option value="{{$good->id}}">{{$good->name}}</option>
                         @endforeach
-                    </select>                    
+                    </select>
                 </div>  
                 <div class="form-group">
                     <label for="qty">Qty</label>
-                    <input type="number" class="form-control" id="qty" name="qty" required autofocus>                     
-                </div>      
+                    <input type="number" class="form-control" id="qty" name="qty" required autofocus>
+                    <input type="hidden" id="_qty" name="_qty"/>
+                </div>
                 <div class="form-group">
                     <label for="reason">Reason</label>
-                    <input type="text" class="form-control" id="reason" name="reason" required autofocus>                     
+                    <input type="text" class="form-control" id="reason" name="reason" required autofocus>
+                    <input type="hidden" id="_reason" name="_reason"/>
                 </div>      
             </div>
             <div class="modal-footer">

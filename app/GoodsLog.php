@@ -17,8 +17,17 @@ class GoodsLog extends Model
         'note',
     ];
 
+    public static function getLatestLog($goods_id){
+        return GoodsLog::where("goods_id", $goods_id)->orderBy('id', 'DESC')->first();
+    }
+
     public function goods()
     {
         return $this->belongsTo('App\Goods');
+    }
+
+    public function logable()
+    {
+        return $this->morphTo();
     }
 }

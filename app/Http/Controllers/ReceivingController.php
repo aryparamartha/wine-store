@@ -72,15 +72,17 @@ class ReceivingController extends Controller
                 $receiving_details[] = $detail->attributesToArray();
                 
                 $supplier = Supplier::find($receiving->supplier_id);
-                $log_before = GoodsLog::where("goods_id", $detail->goods_id)->orderBy('id', 'DESC')->first();
+                $latest_log = GoodsLog::getLatestLog($detail->goods_id);
                 $log = new GoodsLog();
                 $log->goods_id = $detail->goods_id;
                 $log->status = "IN";
                 $log->date = Carbon::now()->format('Y-m-d H:i:s');
                 $log->qty = $detail->qty;
-                $log->post_amount = ($log_before->post_amount ?? 0) + $detail->qty;
+                $log->post_amount = ($latest_log->post_amount ?? 0) + $detail->qty;
                 $log->price = $detail->sub_total;
                 $log->source = $supplier->name;
+                $log->logable_id = $supplier->id;
+                $log->logable_type = 'App\Supplier';
                 $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
                 $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');
                 $logs[] = $log->attributesToArray();
@@ -131,14 +133,15 @@ class ReceivingController extends Controller
             $receiving->save();
             $details = $receiving->details;
             $logs = [];
+            
             foreach($details as $key => $detail){ //log previous goods as out
-                $log_before = GoodsLog::where("goods_id", $detail->goods_id)->orderBy('id', 'DESC')->first();
+                $latest_log = GoodsLog::getLatestLog($detail->goods_id);
                 $log = new GoodsLog();
                 $log->goods_id = $detail->goods_id;
                 $log->status = "OUT";
                 $log->date = Carbon::now()->format('Y-m-d H:i:s');
                 $log->qty = $detail->qty;
-                $log->post_amount = ($log_before->post_amount ?? 0) - $detail->qty;
+                $log->post_amount = ($latest_log->post_amount ?? 0) - $detail->qty;
                 $log->price = $detail->sub_total;
                 $log->source = $supplier->name;
                 $log->note = "Delete receiving";
@@ -163,15 +166,17 @@ class ReceivingController extends Controller
                 $detail->updated_at = Carbon::now()->format('Y-m-d H:i:s');
                 $receiving_details[] = $detail->attributesToArray();
 
-                $log_before = GoodsLog::where("goods_id", $detail->goods_id)->orderBy('id', 'DESC')->first();
+                $latest_log = GoodsLog::getLatestLog($detail->goods_id);
                 $log = new GoodsLog();
                 $log->goods_id = $detail->goods_id;
                 $log->status = "IN";
                 $log->date = Carbon::now()->format('Y-m-d H:i:s');
                 $log->qty = $detail->qty;
-                $log->post_amount = ($log_before->post_amount ?? 0) + $detail->qty;
+                $log->post_amount = ($latest_log->post_amount ?? 0) + $detail->qty;
                 $log->price = $detail->sub_total;
                 $log->source = $supplier->name;
+                $log->logable_id = $supplier->id;
+                $log->logable_type = 'App\Supplier';
                 $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
                 $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');
                 $logs[] = $log->attributesToArray();
@@ -205,15 +210,17 @@ class ReceivingController extends Controller
             $details = $receiving->details;
             $logs = [];
             foreach($details as $key => $detail){ //log previous goods as out
-                $log_before = GoodsLog::where("goods_id", $detail->goods_id)->orderBy('id', 'DESC')->first();
+                $latest_log = GoodsLog::getLatestLog($detail->goods_id);
                 $log = new GoodsLog();
                 $log->goods_id = $detail->goods_id;
                 $log->status = "OUT";
                 $log->date = Carbon::now()->format('Y-m-d H:i:s');
                 $log->qty = $detail->qty;
-                $log->post_amount = ($log_before->post_amount ?? 0) - $detail->qty;
+                $log->post_amount = ($latest_log->post_amount ?? 0) - $detail->qty;
                 $log->price = $detail->sub_total;
                 $log->source = $supplier->name;
+                $log->logable_id = $supplier->id;
+                $log->logable_type = 'App\Supplier';
                 $log->note = "Delete receiving";
                 $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
                 $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');

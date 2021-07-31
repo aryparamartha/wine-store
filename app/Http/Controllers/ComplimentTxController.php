@@ -86,15 +86,17 @@ class ComplimentTxController extends Controller
                     
                     Goods::where("id", $detail->goods_id)->update(["amount" => DB::raw("amount - " . $detail->qty)]);
 
-                    $log_before = GoodsLog::where("goods_id", $detail->goods_id)->orderBy('id', 'DESC')->first();
+                    $latest_log = GoodsLog::getLatestLog($detail->goods_id);
                     $log = new GoodsLog();
                     $log->goods_id = $detail->goods_id;
                     $log->status = "OUT";
                     $log->date = Carbon::now()->format('Y-m-d H:i:s');
                     $log->qty = $detail->qty;
-                    $log->post_amount = ($log_before->post_amount ?? 0) - $detail->qty;
+                    $log->post_amount = ($latest_log->post_amount ?? 0) - $detail->qty;
                     $log->price = $detail->sub_total;
                     $log->source = $customer->name;
+                    $log->logable_id = $customer->id;
+                    $log->logable_type = 'App\Customer';
                     $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
                     $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');
                     $logs[] = $log->attributesToArray();
@@ -211,15 +213,17 @@ class ComplimentTxController extends Controller
                     
                     Goods::where("id", $detail->goods_id)->update(["amount" => DB::raw("amount - " . $detail->qty)]);
 
-                    $log_before = GoodsLog::where("goods_id", $detail->goods_id)->orderBy('id', 'DESC')->first();
+                    $latest_log = GoodsLog::getLatestLog($detail->goods_id);
                     $log = new GoodsLog();
                     $log->goods_id = $detail->goods_id;
                     $log->status = "OUT";
                     $log->date = Carbon::now()->format('Y-m-d H:i:s');
                     $log->qty = $detail->qty;
-                    $log->post_amount = ($log_before->post_amount ?? 0) - $detail->qty;
+                    $log->post_amount = ($latest_log->post_amount ?? 0) - $detail->qty;
                     $log->price = $detail->sub_total;
                     $log->source = $customer->name;
+                    $log->logable_id = $customer->id;
+                    $log->logable_type = 'App\Customer';
                     $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
                     $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');
                     $logs[] = $log->attributesToArray();
