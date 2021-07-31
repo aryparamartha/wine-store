@@ -23,7 +23,7 @@ class TxPaymentLog extends Eloquent
     ];
 
     public function getPaymentProof(){
-        return public_path($this->getDir()) . "/" . $this->transfer_proof;
+        return $this->getDir() . "/" . $this->payment_proof;
     }
     
     public function getDir(){

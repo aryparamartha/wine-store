@@ -22,6 +22,11 @@ $(function() {
             $(this).parent().find('.form-control').val($(this).val().replace(/C:\\fakepath\\/i, ''));
         });
     });
+
+    $('.btn-payment-proof').click(function () {
+        $('#img-proof').attr("src", $(this).data('src'));
+        $('#proof-modal').modal('show');
+    });
 });
 
 $(function() {

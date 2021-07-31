@@ -223,8 +223,8 @@
                                             <div class="row">
                                                 <div class="col-md-12 pb-2">
                                                     <label for="payment_id">Payment <span class="payment-no">{{$key+1}}</span></label>
-                                                    @if($payment_log->payment_type_id!=1)
-                                                    <button type="button" style="float:right" class="btn-payment-proof btn btn-light btn-icon">
+                                                    @if($payment_log->payment_type_id!=1 && $payment_log->payment_proof!="")
+                                                    <button data-src="{{$payment_log->getPaymentProof()}}" type="button" style="float:right" class="btn-payment-proof btn btn-light btn-icon">
                                                     <i data-feather="file"></i>
                                                     </button>
                                                     @endif
@@ -386,4 +386,25 @@
     </div>
 </div>
 </form>
+
+{{-- Modal --}}
+<div class="modal fade" id="proof-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="proof-modal-title">Payment Proof</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="img-proof" src="" width="100%" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{-- Modal --}}
 @endsection
