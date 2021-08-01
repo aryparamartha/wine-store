@@ -66,7 +66,7 @@ class ComplimentTx extends Model
         return $this->belongsTo('App\Customer', 'customer_id');
     }
 
-    public function detail()
+    public function details()
     {
         return $this->hasMany('App\DetComplTx');
     }

@@ -11,6 +11,46 @@ function showCurrency(x){
     return "Rp" + numberWithCommas(x);
 }
 
+function getOptionTemplate(){
+    let options = "";
+    goods_list.forEach((goods, index) => {
+        options += "<option value='"+JSON.stringify(goods)+"'>"+goods.code+" - "+goods.name+"</option>";
+    })
+    return options;
+}
+
+function getItemTemplate(){
+    return `
+    <tr>
+        <td class="cart-no">1</td>
+        <td>
+            <input type="hidden" name="goods_id[]" class="cart-goods-id" />
+            <input type="hidden" name="unit_id[]" class="cart-unit-id" />
+            <input type="hidden" name="sub_total[]" class="cart-sub-total-input" />
+            <select class="cart-goods select-goods form-control" style="width:100% !important" required>
+                <option></option>
+                `+getOptionTemplate()+`
+            </select>
+        </td>
+        <td><input type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value="" required autofocus></td>
+        <td class="cart-unit"></td>
+        <td><input type="text" class="cart-price form-control" name="price[]" /></td>
+        <td>
+            <div style="display: block">%
+            <input style="display: inline-block; width: 60px !important" type="text" class="cart-disc form-control" name="disc[]" placeholder="Disc" value="" autofocus>
+            Rp<input style="display: inline-block; width: 100px !important" type="text" class="cart-disc-price form-control" />
+            </div>
+        </td>
+        <td class="cart-sub-total text-right"></td>
+        <td>
+            <button type="button" class="btn-dlt-cart btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+        </td>
+    </tr>
+    `;
+}
+
 $(function() {
     'use strict';
     $(function() {
@@ -48,7 +88,7 @@ $(function() {
     $("#payment-wrap").on('keyup', '.paid-amount', calculate_current_paid)
 
     $("#btn-add-goods").click(function(){
-        $("#goods-cart").append(itemTemplate);
+        $("#goods-cart").append(getItemTemplate());
         $(".select-goods").select2({placeholder: "Select Product", width: '100%'});
 
         render_cart_number();
@@ -151,7 +191,7 @@ $(function() {
     }
 
     function change_selected_goods(){
-        let index = $(this).index(".select-goods"); 
+        let index = $(this).index(".cart-goods"); 
         let goods = JSON.parse($(this).val());
 
         $(".cart-goods-id").eq(index).val(goods.id)
@@ -165,6 +205,24 @@ $(function() {
 
     function delete_cart(){
         let index = $(this).index(".btn-dlt-cart"); 
+        if($(this).hasClass('update-stock')){
+            let goods_val = $(".cart-goods").eq(index).val();
+            let goods = JSON.parse(goods_val);
+            let qty = parseInt($(".cart-qty").eq(index).val());
+            console.log(goods);
+            goods.amount+=qty;
+            console.log(goods);
+
+            $("option[value='"+goods_val+"']").each(function(){
+                $(this).val(JSON.stringify(goods))
+            })
+            $(".select-goods").select2({placeholder: "Select Product", width: '100%'});
+
+            let goods_index = goods_list.findIndex(x => x.id === goods.id);
+            goods_list[goods_index].amount=goods.amount;
+
+            console.log('stock updated')
+        }
         $("#goods-cart > tr").eq(index).remove();
         render_cart_number();
         calculate_total();
@@ -197,7 +255,6 @@ $(function() {
         
         if(status=="draft") calculate_already_paid();
         else calculate_current_paid();
-        console.log(status)
     }
 
     //calculate already paid (without new payments)

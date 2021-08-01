@@ -27,7 +27,6 @@ class RegularTxController extends Controller
         return view('transaction.regular.index', compact('transactions'));
     }
 
-    
     public function invoice(RegularTx $tx){
         $comp_profile = CompanyProfile::find(1);
         $items = DetRegTx::with('goods','unit')->where('regular_tx_id', '=', $tx->id)->get();
@@ -43,12 +42,10 @@ class RegularTxController extends Controller
         return view('transaction.regular.create', compact('goods', 'customers', 'sellers', 'payment_types'));
     }
 
-    public function store(Request $request)
-    {
-        $notif = [];
-        $input = $request->all();
-        $tx = new RegularTx;
-        $tx->invoice_id = RegularTx::genInvoiceNo();
+    private function setTx($tx, $input){
+        if($tx->invoice_id==""){
+            $tx->invoice_id = RegularTx::genInvoiceNo();
+        }
         $tx->employee_id = Auth::user()->id;
         $tx->customer_id = $input['customer_id'];
         $tx->seller_id = $input['seller_id'];
@@ -59,79 +56,106 @@ class RegularTxController extends Controller
         $tx->total_paid = $input['total_paid'];
         $tx->remainder = $input['remainder'];
 
+        return $tx;
+    }
+
+    private function setDetailTx($detail, $tx, $goods_id, $input, $key){
+        $detail->regular_tx_id = $tx->id;
+        $detail->goods_id = $goods_id;
+        $detail->qty = $input['qty'][$key];
+        $detail->unit_id = $input['unit_id'][$key];
+        $detail->price = $input['price'][$key];
+        $detail->disc = $input['disc'][$key] ?: 0;
+        $detail->sub_total = $input['sub_total'][$key];
+        $detail->created_at = Carbon::now()->format('Y-m-d H:i:s');
+        $detail->updated_at = Carbon::now()->format('Y-m-d H:i:s');
+
+        return $detail;
+    }
+
+    private function setGoodsLog($detail, $latest_log, $customer, $status="OUT", $note=""){
+        $log = new GoodsLog();
+        $log->goods_id = $detail->goods_id;
+        $log->status = $status;
+        $log->date = Carbon::now()->format('Y-m-d H:i:s');
+        $log->qty = $detail->qty;
+        if ($status=="OUT") {
+            $log->post_amount = ($latest_log->post_amount ?? 0) - $detail->qty;
+        } else {
+            $log->post_amount = ($latest_log->post_amount ?? 0) + $detail->qty;
+        }
+        $log->price = $detail->sub_total;
+        $log->source = $customer->name;
+        $log->note = $note;
+        $log->logable_id = $customer->id;
+        $log->logable_type = 'App\Customer';
+        $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
+        $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');
+        
+        return $log;
+    }
+
+    private function setPaymentLog($tx, $file, $input, $key){
+        $log_payment = new TxPaymentLog();
+        $log_payment->tx_id = $tx->id;
+        $log_payment->logable_id = $tx->id;
+        $log_payment->logable_type = 'App\RegularTx';
+        $log_payment->payment_type_id = $input['payment_id'][$key];
+        $log_payment->paid_amount = $input['paid_amount'][$key];
+        $log_payment->tx_type = 1;
+        $log_payment->pic = Auth::user()->id;
+        $log_payment->payment_proof = "";
+        //upload
+        if($file !== null && array_key_exists($key, $file)){
+            $log_payment->payment_proof = $tx->invoice_id . "_proof_". ($key+1) ."." . $file[$key]->getClientOriginalExtension();
+            $log_payment->uploadPhoto($file[$key], $log_payment->payment_proof);
+            $log_payment_proofs[] = $log_payment;
+        }
+        $log_payment->created_at = Carbon::now()->format('Y-m-d H:i:s');
+
+        return $log_payment;
+    }
+
+    public function store(Request $request)
+    {
+        $notif = [];
+        $input = $request->all();
+        $tx =  $this->setTx(new RegularTx, $input);
+
         $log_payment_proofs = [];
         try{
             DB::beginTransaction();
-
             $tx->save();
-            $payment_type = [];
 
+            $payment_type = [];
             $tx_details = [];
             $logs = [];
             foreach($input['goods_id'] as $key => $goods_id){
-                $detail = new DetRegTx;
-                $detail->regular_tx_id = $tx->id;
-                $detail->goods_id = $goods_id;
-                $detail->qty = $input['qty'][$key];
-                $detail->unit_id = $input['unit_id'][$key];
-                $detail->price = $input['price'][$key];
-                $detail->disc = $input['disc'][$key] ?: 0;
-                $detail->sub_total = $input['sub_total'][$key];
-                $detail->created_at = Carbon::now()->format('Y-m-d H:i:s');
-                $detail->updated_at = Carbon::now()->format('Y-m-d H:i:s');
+                $detail = $this->setDetailTx(new DetRegTx, $tx, $goods_id, $input, $key);
                 $tx_details[] = $detail->attributesToArray();
 
-                if($tx->status=='paid' || $tx->status=='down payment'){
-                    $customer = Customer::find($tx->customer_id);
-                    
-                    Goods::where("id", $detail->goods_id)->update(["amount" => DB::raw("amount - " . $detail->qty)]);
-
-                    $latest_log = GoodsLog::getLatestLog($detail->goods_id);
-                    $log = new GoodsLog();
-                    $log->goods_id = $detail->goods_id;
-                    $log->status = "OUT";
-                    $log->date = Carbon::now()->format('Y-m-d H:i:s');
-                    $log->qty = $detail->qty;
-                    $log->post_amount = ($latest_log->post_amount ?? 0) - $detail->qty;
-                    $log->price = $detail->sub_total;
-                    $log->source = $customer->name;
-                    $log->logable_id = $customer->id;
-                    $log->logable_type = 'App\Customer';
-                    $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
-                    $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');
-                    $logs[] = $log->attributesToArray();
-                }
+                $latest_log = GoodsLog::getLatestLog($detail->goods_id);
+                $customer = Customer::find($tx->customer_id);
+                $log = $this->setGoodsLog($detail, $latest_log, $customer, "OUT");
+                $logs[] = $log->attributesToArray();
+                
+                //update stock
+                Goods::where("id", $detail->goods_id)->update(["amount" => DB::raw("amount - " . $detail->qty)]);
             }
             DetRegTx::insert($tx_details);
-            if($tx->status=='paid' || $tx->status=='down payment'){
-                GoodsLog::insert($logs);
-            }
+            GoodsLog::insert($logs);
 
             //insert log payment if tx status is not unpaid
-            if($tx->status!='unpaid'){
+            if($tx->status!='unpaid' && array_key_exists('payment_id', $input)){
+                
                 $log_payments = [];
                 foreach($input['payment_id'] as $key => $payment_id){
-                    $log_payment = new TxPaymentLog();
-                    $log_payment->tx_id = $tx->id;
-                    $log_payment->logable_id = $tx->id;
-                    $log_payment->logable_type = 'App\RegularTx';
-                    $log_payment->payment_type_id = $payment_id;
-                    $log_payment->paid_amount = $input['paid_amount'][$key];
-                    $log_payment->tx_type = 1;
-                    $log_payment->pic = Auth::user()->id;
-                    $log_payment->payment_proof = "";
-                    //upload
-                    $file = $request->file('payment_proof');
-                    if($file !== null && array_key_exists($key, $file)){
-                        $log_payment->payment_proof = $tx->invoice_id . "_proof_". ($key+1) ."." . $file[$key]->getClientOriginalExtension();
-                        $log_payment->uploadPhoto($file[$key], $log_payment->payment_proof);
-                        $log_payment_proofs[] = $log_payment;
-                    }
-                    $log_payment->created_at = Carbon::now()->format('Y-m-d H:i:s');
+                    $log_payment = $this->setPaymentLog($tx, $request->file('payment_proof'), $input, $key);
                     $log_payments[] = $log_payment->attributesToArray();
                     $payment_type[] = $input['payment_name'][$key];
                 }
                 TxPaymentLog::insert($log_payments);
+
                 //update payment date
                 if(count($log_payments)){
                     $tx->payment_date =  Carbon::now()->format('Y-m-d H:i:s');
@@ -172,94 +196,66 @@ class RegularTxController extends Controller
     public function update(Request $request, RegularTx $tx)
     { 
         $input = $request->all();
-        
-        $tx->employee_id = Auth::user()->id;
-        $tx->customer_id = $input['customer_id'];
-        $tx->seller_id = $input['seller_id'];
-        $tx->total = $input['total'];
-        $tx->tax = $input['tax'];
-        $tx->grand_total = $input['grand_total'];
-        $previous_status = $tx->status; //get prev tx status before update it
-        $tx->status = $input['status'];
-        $tx->total_paid = $input['total_paid'];
-        $tx->remainder = $input['remainder'];
+        $tx =  $this->setTx($tx, $input);
 
         $log_payment_proofs = [];
         try{
             DB::beginTransaction();
-
             $tx->save();
+
             $payment_type = explode(", ", $tx->payment_type);
-            DetRegTx::where('regular_tx_id', $tx->id)->delete();
-            
             $tx_details = [];
             $logs = [];
-            foreach($input['goods_id'] as $key => $goods_id){
-                $detail = new DetRegTx;
-                $detail->regular_tx_id = $tx->id;
-                $detail->goods_id = $goods_id;
-                $detail->qty = $input['qty'][$key];
-                $detail->unit_id = $input['unit_id'][$key];
-                $detail->price = $input['price'][$key];
-                $detail->disc = $input['disc'][$key] ?: 0;
-                $detail->sub_total = $input['sub_total'][$key];
-                $detail->created_at = Carbon::now()->format('Y-m-d H:i:s');
-                $detail->updated_at = Carbon::now()->format('Y-m-d H:i:s');
-                $tx_details[] = $detail->attributesToArray();
-                
-                //if previous status is unpaid and the current status != unpaid, update the products stock
-                if($previous_status=='unpaid' && ($tx->status=='paid' || $tx->status=='down payment')){
-                    $customer = Customer::find($tx->customer_id);
+            
+            //remove deleted item cart
+            $tx_detail_ids = array_key_exists('tx_detail_id', $input) ? $input['tx_detail_id'] : [];
+            $remove_detail_ids = array_diff( $tx->details()->pluck('id')->toArray(), $tx_detail_ids );
+            if (count($remove_detail_ids) > 0) {
+                foreach($tx->details as $key => $detail){
+                    if(!in_array($detail->id, $remove_detail_ids)) continue; //skip if details not deleted
 
-                    Goods::where("id", $detail->goods_id)->update(["amount" => DB::raw("amount - " . $detail->qty)]);
-
+                    //restore stock
+                    Goods::where("id", $detail->goods_id)->update(["amount" => DB::raw("amount + " . $detail->qty)]);
+                    
+                    //update log (add stock)
                     $latest_log = GoodsLog::getLatestLog($detail->goods_id);
-                    $log = new GoodsLog();
-                    $log->goods_id = $detail->goods_id;
-                    $log->status = "OUT";
-                    $log->date = Carbon::now()->format('Y-m-d H:i:s');
-                    $log->qty = $detail->qty;
-                    $log->post_amount = ($latest_log->post_amount ?? 0) - $detail->qty;
-                    $log->price = $detail->sub_total;
-                    $log->source = $customer->name;
-                    $log->logable_id = $customer->id;
-                    $log->logable_type = 'App\Customer';
-                    $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
-                    $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');
+                    $customer = Customer::find($tx->customer_id);
+                    $log = $this->setGoodsLog($detail, $latest_log, $customer, "IN", "Update Transaction");
                     $logs[] = $log->attributesToArray();
                 }
-            }
-            DetRegTx::insert($tx_details);
-            //if previous status is unpaid and the current status != unpaid, create product logs
-            if($previous_status=='unpaid' && ($tx->status=='paid' || $tx->status=='down payment')){
+                //destroy deleted item cart in detail
+                DetRegTx::destroy($remove_detail_ids);
                 GoodsLog::insert($logs);
             }
 
+            $logs = [];
+            $input['goods_id'] = array_filter($input['goods_id']); //get new item cart only
+            foreach($input['goods_id'] as $key => $goods_id){
+                $detail = $this->setDetailTx(new DetRegTx, $tx, $goods_id, $input, $key);
+                $tx_details[] = $detail->attributesToArray();
+
+                $latest_log = GoodsLog::getLatestLog($detail->goods_id);
+                $customer = Customer::find($tx->customer_id);
+                $log = $this->setGoodsLog($detail, $latest_log, $customer, "OUT");
+                $logs[] = $log->attributesToArray();
+                
+                //update stock
+                Goods::where("id", $detail->goods_id)->update(["amount" => DB::raw("amount - " . $detail->qty)]);
+            }
+            DetRegTx::insert($tx_details);
+            GoodsLog::insert($logs);
+
             //insert log payment if tx status is not unpaid
-            if($tx->status!='unpaid'){
+            if($tx->status!='unpaid' && array_key_exists('payment_id', $input)){
+                
                 $log_payments = [];
                 foreach($input['payment_id'] as $key => $payment_id){
-                    $log_payment = new TxPaymentLog();
-                    $log_payment->tx_id = $tx->id;
-                    $log_payment->logable_id = $tx->id;
-                    $log_payment->logable_type = 'App\RegularTx';
-                    $log_payment->payment_type_id = $payment_id;
-                    $log_payment->paid_amount = $input['paid_amount'][$key];
-                    $log_payment->tx_type = 1;
-                    $log_payment->pic = Auth::user()->id;
-                    $log_payment->payment_proof = "";
-                    //upload
-                    $file = $request->file('payment_proof');
-                    if($file !== null && array_key_exists($key, $file)){
-                        $log_payment->payment_proof = $tx->invoice_id . "_proof_". ($key+1) ."." . $file[$key]->getClientOriginalExtension();
-                        $log_payment->uploadPhoto($file[$key], $log_payment->payment_proof);
-                        $log_payment_proofs[] = $log_payment;
-                    }
-                    $log_payment->created_at = Carbon::now()->format('Y-m-d H:i:s');
+                    $log_payment = $this->setPaymentLog($tx, $request->file('payment_proof'), $input, $key);
                     $log_payments[] = $log_payment->attributesToArray();
                     $payment_type[] = $input['payment_name'][$key];
                 }
                 TxPaymentLog::insert($log_payments);
+
                 //update payment date
                 if(count($log_payments)){
                     $tx->payment_date =  Carbon::now()->format('Y-m-d H:i:s');
