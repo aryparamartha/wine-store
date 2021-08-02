@@ -289,4 +289,39 @@ class RegularTxController extends Controller
         return redirect()->route('tx.regular.index')->with($notif['type'], $notif['message']);
     }
     
+    public function destroy(RegularTx $tx){
+        try{
+            DB::beginTransaction();
+            $logs = [];
+            foreach($tx->details as $key => $detail){
+                //restore stock
+                Goods::where("id", $detail->goods_id)->update(["amount" => DB::raw("amount + " . $detail->qty)]);
+
+                //update log (add stock)
+                $latest_log = GoodsLog::getLatestLog($detail->goods_id);
+                $customer = Customer::find($tx->customer_id);
+                $log = $this->setGoodsLog($detail, $latest_log, $customer, "IN", "Delete Transaction");
+                $logs[] = $log->attributesToArray();
+            }
+            //destroy deleted item cart in detail
+            DetRegTx::destroy($tx->details()->pluck('id')->toArray());
+            GoodsLog::insert($logs);
+            $tx->delete();
+
+            DB::commit();
+            $notif = [
+                "type" => "success",
+                "message" => "Regular transaction has been deleted!"
+            ];
+        }catch(\Exception $e){
+            DB::rollback();
+            $notif = [
+                "type" => "failed",
+                "message" => "Failed to delete regular transaction!"
+            ];
+            dd($e);
+        }
+
+        return redirect()->route('tx.regular.index')->with($notif['type'], $notif['message']);
+    }
 }
