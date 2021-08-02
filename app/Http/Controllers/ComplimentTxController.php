@@ -203,7 +203,7 @@ class ComplimentTxController extends Controller
             DB::beginTransaction();
             $tx->save();
 
-            $payment_type = explode(", ", $tx->payment_type);
+            $payment_type = array_filter(explode(", ", $tx->payment_type));
             $tx_details = [];
             $logs = [];
             
