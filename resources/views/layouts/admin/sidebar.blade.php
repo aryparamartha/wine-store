@@ -19,13 +19,13 @@
             </li>
 
             <li class="nav-item nav-category">Transactions</li>
-            <li class="nav-item">
+            <li class="nav-item {{(isset($sidebar) && $sidebar=='regular_tx') ? 'active' : ''}}">
                 <a href="{{route('tx.regular.index')}}" class="nav-link">
                     <i class="link-icon" data-feather="shopping-cart"></i>
                     <span class="link-title">Regular</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item {{(isset($sidebar) && $sidebar=='compliment_tx') ? 'active' : ''}}">
                 <a href="{{route('tx.compliment.index')}}" class="nav-link">
                     <i class="link-icon" data-feather="percent"></i>
                     <span class="link-title">Surat Jalan</span>
@@ -45,7 +45,7 @@
                     <span class="link-title">Products</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item {{(isset($sidebar) && $sidebar=='receiving') ? 'active' : ''}}">
                 <a href="{{route('receiving.index')}}" class="nav-link">
                     <i class="link-icon" data-feather="plus-square"></i>
                     <span class="link-title">Receiving</span>

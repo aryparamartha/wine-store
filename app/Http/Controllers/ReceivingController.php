@@ -7,19 +7,23 @@ use App\GoodsLog;
 use App\CompanyProfile;
 use App\DetReceiving;
 use App\Receiving;
-use App\Seller;
 use App\Supplier;
 use App\Unit;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Hash;
 
-use DB;
+use Auth;
 use Carbon;
+use DB;
+use File;
+use View;
 
 class ReceivingController extends Controller
 {
+    public function __construct()
+    {
+        View::share('sidebar', 'receiving');
+    }
+
     public function index()
     {
         $receivings = Receiving::with('supplier','employee')->get();

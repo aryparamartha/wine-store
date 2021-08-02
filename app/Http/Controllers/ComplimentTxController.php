@@ -12,15 +12,20 @@ use App\PaymentType;
 use App\Seller;
 use App\TxPaymentLog;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Hash;
 
-use DB;
+use Auth;
 use Carbon;
+use DB;
+use File;
+use View;
 
 class ComplimentTxController extends Controller
 {
+    public function __construct()
+    {
+        View::share('sidebar', 'compliment_tx');
+    }
+
     public function index()
     {
         $transactions = ComplimentTx::with('customer','employee')->get();
