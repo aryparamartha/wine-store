@@ -38,37 +38,32 @@
 </script>
 <script>
     $(document).ready(function () {
-        $('.btn-proof').click(function () {
-            $('#img-proof').attr("src", $(this).data('src'));
-            $('#proof-modal').modal('show');
-        });
-    });
-    
-    $(".btn-dlt-alert").click(function(event){
-        button = $(this);
-        console.log(button);
-        index = $(".btn-dlt-alert").index(button);
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-            confirmButton: 'btn btn-success',
-            cancelButton: 'btn btn-danger'
-            },
-            buttonsStyling: false,
-        })
-        
-        swalWithBootstrapButtons.fire({
-            title: button.data("title"),
-            text: button.data("text"),
-            type: 'warning',
-            showCancelButton: true,
-            confirmButtonClass: 'ml-2',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'No, cancel!',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.value) {
-                $(".frm-dlt-alert").eq(index).submit();
-            }
+        $(".btn-dlt-alert").click(function(event){
+            button = $(this);
+            console.log(button);
+            index = $(".btn-dlt-alert").index(button);
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                confirmButton: 'btn btn-success',
+                cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false,
+            })
+            
+            swalWithBootstrapButtons.fire({
+                title: button.data("title"),
+                text: button.data("text"),
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonClass: 'ml-2',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    $(".frm-dlt-alert").eq(index).submit();
+                }
+            });
         });
     });
 </script>
@@ -163,26 +158,4 @@
         </div>
     </div>
 </div>
-
-
-{{-- Modal --}}
-<div class="modal fade" id="proof-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="proof-modal-title">Transfer Proof</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <img id="img-proof" src="" width="100%" />
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-{{-- Modal --}}
 @endsection
