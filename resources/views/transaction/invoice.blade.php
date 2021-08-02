@@ -147,6 +147,7 @@
                             @endif
                         </tfoot>
                     </table>
+                    @if($type=="compliment")
                     <table style="width: 60%; margin-top: 60px">
                         <tr>
                             <td align="center">Sender</td>
@@ -157,6 +158,7 @@
                             <td style="padding-top: 50px" align="center">__________________________</td>
                         </tr>
                     </table>
+                    @endif
                 </div>
             </div>
         </div>

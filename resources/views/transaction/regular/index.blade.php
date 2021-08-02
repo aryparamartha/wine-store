@@ -127,11 +127,10 @@
                                     </td>
                                     <td>{{ $tx->payment_type }}</td>
                                     <td>
-                                        @if($tx->status=="paid")
                                         <a href="{{route('tx.regular.invoice', $tx)}}" target="_blank" class="btn btn-light btn-icon">
                                             <i data-feather="printer"></i>
                                         </a>
-                                        @else
+                                        @if($tx->status!="paid")
                                         <a href="{{route('tx.regular.draft', $tx)}}" class="btn btn-primary btn-icon">
                                             <i data-feather="edit"></i>
                                         </a>
