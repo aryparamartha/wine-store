@@ -41,35 +41,33 @@
     var goods_list = @json($goods);
 
     var paymentTemplate = `
-        <div class="col-md-12">
-            <div class="form-group border-bottom">
-                <div class="row">
-                    <div class="col-md-12 pb-2">
-                        <label for="payment_id">Payment <span class="payment-no">1</span></label>
-                        <button type="button" style="float:right" class="btn-dlt-payment btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>
-                    </div>
-                    <div class="col-md-6">
-                        <input value="{{$payment_types[0]->name}}" type="hidden" name="payment_name[]" class="payment-name"/>
-                        <select name="payment_id[]" class="select-payment-id w-100 form-control">
-                            @foreach($payment_types as $payment)
-                            <option value="{{$payment->id}}">{{$payment->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-6 pb-2">
-                        <input type="text" class="paid-amount form-control" name="paid_amount[]">
-                    </div>
-                    <div class="col-md-12 transfer-proof-body" style="display:none">
-                        <div class="form-group">
-                            <input type="file" name="payment_proof[]" class="file-upload-default">
-                            <div class="input-group col-xs-12">
-                                <input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Proof">
-                                <span class="input-group-append">
-                                    <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
-                                </span>
-                            </div>
+        <div class="form-group border-bottom">
+            <div class="row">
+                <div class="col-md-12 pb-2">
+                    <label for="payment_id">Payment <span class="payment-no">1</span></label>
+                    <button type="button" style="float:right" class="btn-dlt-payment btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <input value="{{$payment_types[0]->name}}" type="hidden" name="payment_name[]" class="payment-name"/>
+                    <select name="payment_id[]" class="select-payment-id w-100 form-control">
+                        @foreach($payment_types as $payment)
+                        <option value="{{$payment->id}}">{{$payment->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-6 pb-2">
+                    <input type="text" class="paid-amount form-control" name="paid_amount[]">
+                </div>
+                <div class="col-md-12 transfer-proof-body" style="display:none">
+                    <div class="form-group">
+                        <input type="file" name="payment_proof[]" class="file-upload-default">
+                        <div class="input-group col-xs-12">
+                            <input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Proof">
+                            <span class="input-group-append">
+                                <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -176,47 +174,43 @@
                                     <button type="button" id="btn-payment" class="btn btn-light mr-2 w-100">Payment</button>
                                     </div>
                                 </div>
-                                <div id="payment-wrap" style="display:none">
+                                <div id="payment-wrap" class="col-md-12" style="display:none">
                                     <div id="payment-body">
-                                        <div class="col-md-12">
-                                            <div class="form-group border-bottom">
-                                                <div class="row">
-                                                    <div class="col-md-12 pb-2">
-                                                        <label for="payment_id">Payment <span class="payment-no">1</span></label>
-                                                        <button type="button" style="float:right" class="btn-dlt-payment btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
-                                                            <i data-feather="trash"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <input value="{{$payment_types[0]->name}}" type="hidden" name="payment_name[]" class="payment-name"/>
-                                                        <select name="payment_id[]" class="select-payment-id w-100 form-control">
-                                                            @foreach($payment_types as $payment)
-                                                            <option value="{{$payment->id}}">{{$payment->name}}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-6 pb-2">
-                                                        <input type="text" class="paid-amount form-control" name="paid_amount[]">
-                                                    </div>
-                                                    <div class="col-md-12 transfer-proof-body" style="display:none">
-                                                        <div class="form-group">
-                                                            <input type="file" name="payment_proof[]" class="file-upload-default">
-                                                            <div class="input-group col-xs-12">
-                                                                <input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Proof">
-                                                                <span class="input-group-append">
-                                                                    <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
-                                                                </span>
-                                                            </div>
+                                        <div class="form-group border-bottom">
+                                            <div class="row">
+                                                <div class="col-md-12 pb-2">
+                                                    <label for="payment_id">Payment <span class="payment-no">1</span></label>
+                                                    <button type="button" style="float:right" class="btn-dlt-payment btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
+                                                        <i data-feather="trash"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <input value="{{$payment_types[0]->name}}" type="hidden" name="payment_name[]" class="payment-name"/>
+                                                    <select name="payment_id[]" class="select-payment-id w-100 form-control">
+                                                        @foreach($payment_types as $payment)
+                                                        <option value="{{$payment->id}}">{{$payment->name}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6 pb-2">
+                                                    <input type="text" class="paid-amount form-control" name="paid_amount[]">
+                                                </div>
+                                                <div class="col-md-12 transfer-proof-body" style="display:none">
+                                                    <div class="form-group">
+                                                        <input type="file" name="payment_proof[]" class="file-upload-default">
+                                                        <div class="input-group col-xs-12">
+                                                            <input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Proof">
+                                                            <span class="input-group-append">
+                                                                <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-12">
-                                        <div class="form-group">
+                                    <div class="form-group">
                                         <button type="button" id="btn-add-payment" class="btn btn-secondary mr-2 w-100">Add Payment</button>
-                                        </div>
                                     </div>
                                 </div>
                                 <input type="hidden" id="status" name="status" value="unpaid" />
