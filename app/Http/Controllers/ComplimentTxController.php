@@ -190,7 +190,9 @@ class ComplimentTxController extends Controller
     }
 
     public function draft(ComplimentTx $tx){
-        $details = DetComplTx::with('goods','unit')->where('compliment_tx_id', '=', $tx->id)->get();
+        $details = DetComplTx::with(['goods' => function($q){
+            $q->with('unit');
+        }])->where('compliment_tx_id', '=', $tx->id)->get();
         $goods = Goods::with('unit')->get();
         $customers = Customer::get();
         $sellers = Seller::get();

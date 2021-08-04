@@ -190,7 +190,9 @@ class RegularTxController extends Controller
     }
 
     public function draft(RegularTx $tx){
-        $details = DetRegTx::with('goods','unit')->where('regular_tx_id', '=', $tx->id)->get();
+        $details = DetRegTx::with(['goods' => function($q){
+            $q->with('unit');
+        }])->where('regular_tx_id', '=', $tx->id)->get();
         $goods = Goods::with('unit')->get();
         $customers = Customer::get();
         $sellers = Seller::get();
