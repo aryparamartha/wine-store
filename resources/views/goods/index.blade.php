@@ -205,7 +205,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="form-group">
+                {{-- <div class="form-group">
                     <label for="amount">Amount</label>
                     <input type="number" class="form-control" id="amount" name="amount" required autofocus>                     
                 </div>
@@ -216,7 +216,7 @@
                 <div class="form-group">
                     <label for="selling_price">Selling Price</label>
                     <input type="number" class="form-control" id="selling_price" name="selling_price" required autofocus>                     
-                </div>
+                </div> --}}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

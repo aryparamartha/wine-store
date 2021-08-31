@@ -139,16 +139,42 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($customers as $key => $customer) 
+                                @foreach($customers as $key => $customer)
+                                     
                                 <tr>
                                     <td>{{$key+1}}</td>
                                     <td>{{ $customer->name }}</td>
+                                    @if (is_null($customer->address))
+                                    <td> </td>
+                                    @else
                                     <td>{{ $customer->address }}</td>
+                                    @endif
+
+                                    @if (is_null($customer->number))
+                                    <td> </td>
+                                    @else
                                     <td>{{ $customer->number }}</td>
+                                    @endif
+
+                                    @if (is_null($customer->email))
+                                    <td> </td>
+                                    @else
                                     <td>{{ $customer->email }}</td>
+                                    @endif
+                                    
+                                    @if (empty($customer->employee->name))
+                                    <td> </td>
+                                    @else
                                     <td>{{ $customer->employee->name }}</td>
+                                    @endif
+                                    {{-- <td>{{ $customer->employee->name }}</td> --}}
                                     <td>{{ $customer->type }}</td>
+                                    @if (is_null($customer->note))
+                                    <td></td>
+                                    @else
                                     <td>{{ $customer->note }}</td>
+                                    @endif
+                                    {{-- <td>{{ $customer->note }}</td> --}}
                                     <td>
                                         <button data-index="{{$key}}" class="btn-edit-customer btn btn-primary btn-icon">
                                             <i data-feather="edit"></i>
@@ -191,19 +217,19 @@
                 </div>      
                 <div class="form-group">
                     <label for="address">Address</label>
-                    <input type="text" class="form-control" id="address" name="address" required autofocus>                     
+                    <input type="text" class="form-control" id="address" name="address" autofocus>                     
                 </div>      
                 <div class="form-group">
                     <label for="number">Number</label>
-                    <input type="text" class="form-control" id="number" name="number" required autofocus>                     
+                    <input type="text" class="form-control" id="number" name="number" autofocus>                     
                 </div>      
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required autofocus>                     
+                    <input type="email" class="form-control" id="email" name="email" autofocus>                     
                 </div>      
                 <div class="form-group">
                     <label for="pic" class="w-100">PIC</label>
-                    <select id="pic" name="pic" class="select2 form-control" required>
+                    <select id="pic" name="pic" class="select2 form-control">
                         <option></option>
                         @foreach($employees as $employee)
                         <option value="{{$employee->id}}">{{$employee->name}}</option>
@@ -219,7 +245,7 @@
                 </div>  
                 <div class="form-group">
                     <label for="note">Note</label>
-                    <input type="text" class="form-control" id="note" name="note" required autofocus>                     
+                    <input type="text" class="form-control" id="note" name="note" autofocus>                     
                 </div>    
             </div>
             <div class="modal-footer">

@@ -188,8 +188,8 @@
                     <input type="text" class="form-control" id="address" name="address" required autofocus>                     
                 </div>
                 <div class="form-group">
-                    <label for="birthpl">Birthpl</label>
-                    <input type="date" class="form-control" id="birthpl" name="birthpl" required autofocus>                     
+                    <label for="birthpl">Birthplace</label>
+                    <input type="text" class="form-control" id="birthpl" name="birthpl" required autofocus>                     
                 </div>
                 <div class="form-group">
                     <label for="birthdate">Birthdate</label>
