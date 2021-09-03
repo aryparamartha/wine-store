@@ -70,10 +70,18 @@ class ReceivingController extends Controller
                 $detail->qty = $input['qty'][$key];
                 $detail->unit_id = $input['unit_id'][$key];
                 $detail->price = $input['price'][$key];
+                $detail->selling_price = $input['selling_price'][$key];
                 $detail->sub_total = $input['sub_total'][$key];
                 $detail->created_at = Carbon::now()->format('Y-m-d H:i:s');
                 $detail->updated_at = Carbon::now()->format('Y-m-d H:i:s');
                 $receiving_details[] = $detail->attributesToArray();
+
+                DB::table('goods')
+                    ->where('id', $goods_id)
+                    ->update(['selling_price' => $input['selling_price'][$key],
+                              'purchase_price' => $input['price'][$key]]);
+
+                
                 
                 $supplier = Supplier::find($receiving->supplier_id);
                 $latest_log = GoodsLog::getLatestLog($detail->goods_id);
@@ -86,6 +94,7 @@ class ReceivingController extends Controller
                 $log->price = $detail->sub_total;
                 $log->source = $supplier->name;
                 $log->logable_id = $supplier->id;
+                $log->note = "Add receiving";
                 $log->logable_type = 'App\Supplier';
                 $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
                 $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');
@@ -166,9 +175,15 @@ class ReceivingController extends Controller
                 $detail->unit_id = $input['unit_id'][$key];
                 $detail->price = $input['price'][$key];
                 $detail->sub_total = $input['sub_total'][$key];
+                $detail->selling_price = $input['selling_price'][$key];
                 $detail->created_at = Carbon::now()->format('Y-m-d H:i:s');
                 $detail->updated_at = Carbon::now()->format('Y-m-d H:i:s');
                 $receiving_details[] = $detail->attributesToArray();
+
+                DB::table('goods')
+                    ->where('id', $goods_id)
+                    ->update(['selling_price' => $input['selling_price'][$key],
+                              'purchase_price' => $input['price'][$key]]);
 
                 $latest_log = GoodsLog::getLatestLog($detail->goods_id);
                 $log = new GoodsLog();
@@ -180,6 +195,7 @@ class ReceivingController extends Controller
                 $log->price = $detail->sub_total;
                 $log->source = $supplier->name;
                 $log->logable_id = $supplier->id;
+                $log->note = "Update receiving";
                 $log->logable_type = 'App\Supplier';
                 $log->created_at = Carbon::now()->format('Y-m-d H:i:s');
                 $log->updated_at = Carbon::now()->format('Y-m-d H:i:s');

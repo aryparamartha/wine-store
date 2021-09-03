@@ -36,7 +36,7 @@
             <li class="nav-item">
                 <a href="{{route('unit.index')}}" class="nav-link">
                     <i class="link-icon" data-feather="grid"></i>
-                    <span class="link-title">Units</span>
+                    <span class="link-title">Units</span>   
                 </a>
             </li>
             <li class="nav-item">

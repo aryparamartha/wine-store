@@ -24,17 +24,18 @@ class GoodsController extends Controller
     public function insert(Request $request)
     {
         $input = $request->all();
-        $input["tax_price"] = bcdiv(10/11 * $input["selling_price"], 1, 2) + 0.01;
+        
+        // $input["tax_price"] = bcdiv(10/11 * $input["selling_price"], 1, 2) + 0.01;
         try{
             DB::beginTransaction();
-            $goods = Goods::create($input);
+            // $goods = Goods::create($input);
             //log first register goods
             $log = new GoodsLog();
             $log->goods_id = $goods->id;
             $log->status = "IN";
             $log->date = Carbon::now()->format('Y-m-d H:i:s');
-            $log->qty = $goods->amount;
-            $log->post_amount = $goods->amount;
+            $log->qty = 0;
+            $log->post_amount = 0;
             $log->price = 0;
             $log->source = "First Register";
             $log->save();
@@ -42,7 +43,8 @@ class GoodsController extends Controller
         }catch(\Exception $e){
             DB::rollback();
         }
-        return $goods;
+       
+        return Goods::create($input);
     }
 
     public function storeAPI(Request $request){

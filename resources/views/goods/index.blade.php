@@ -58,7 +58,7 @@
         $('.btn-edit-goods').click(function() {
             var index = $(this).data('index');
             var good = goods[index]
-            $('#goods-form').attr('action', '/goods/update/' + good.id);
+            $('#goods-form').attr('action', '/update/goods/' + good.id);
             $('#goods-modal-title').html("Update Product");
             $('#goods-modal').modal('show');
             $('#code').val(good.code);
@@ -117,13 +117,13 @@
                         <div class="col-md-6 col-6">
                             <h6 class="card-title">Product Data</h6>
                         </div>
-                        <div class="col-md-6 col-6">
+                        {{-- <div class="col-md-6 col-6">
                             <div class="flt-right">
                                 <a class="btn btn-success btn-icon-text btn-edit-profile" href="javascript:void(0)" id="btn-add-goods" >
                                     <i data-feather="plus" class="btn-icon-prepend"></i> Add Product
                                 </a>
                             </div>  
-                        </div>
+                        </div> --}}
                     </div>          
                     <div class="table-responsive">
                         <table id="dataTableExample" class="table">

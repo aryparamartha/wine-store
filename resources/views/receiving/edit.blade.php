@@ -74,6 +74,7 @@
                 <td>
                     <input type="hidden" name="goods_id[]" class="cart-goods-id" />
                     <input type="hidden" name="unit_id[]" class="cart-unit-id" />
+                    <input type="hidden" name="sub_total[]" class="cart-sub-total-input" />
                     <select class="cart-goods select-goods form-control" style="width:100% !important" required>
                         <option></option>
                         @foreach($goods as $good)
@@ -84,8 +85,10 @@
                 </td>
                 <td><input type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value="" required autofocus></td>
                 <td class="cart-unit"></td>
-                <td><input type="text" name="price[]" class="cart-price form-control" /></td>
-                <td><input type="text" name="sub_total[]" class="cart-sub-total form-control" /></td>
+                <td><input type="text" name="price[]" class="cart-price form-control" required autofocus /></td>
+                
+                <td class="cart-sub-total text-right"></td>
+                <td><input type="text" name="selling_price[]" class="cart-selling-price form-control" required autofocus/></td>
                 <td>
                     <button type="button" class="btn-dlt-cart btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
@@ -102,18 +105,21 @@
         });
         $("#goods-cart").on('change', '.select-goods', change_selected_goods)
         $("#goods-cart").on('change', '.cart-sub-total', calculate_total)
+        $("#goods-cart").on('change', '.cart-qty', calculate_subtotal)
+        $("#goods-cart").on('change', '.cart-price', calculate_subtotal)
+        $("#goods-cart").on('change', '.cart-price', calculate_total)
         $("#goods-cart").on('click', '.btn-dlt-cart', delete_cart)
 
         function change_selected_goods(){
             let index = $(this).index(".select-goods"); 
             let goods = JSON.parse($(this).val());
             let qty = $(".cart-qty").eq(index).val()
-            let sub_total = goods.selling_price * qty;
+            // let sub_total = goods.selling_price * qty;
 
             $(".cart-goods-id").eq(index).val(goods.id)
             $(".cart-unit-id").eq(index).val(goods.unit.id)
             $(".cart-unit").eq(index).html(goods.unit.name)
-            calculate_total();
+            // calculate_subtotal();
         }
 
         function delete_cart(){
@@ -123,13 +129,55 @@
             calculate_total();
         }
 
+        // function calculate_total(){
+        //     let total = 0;
+        //     $(".cart-sub-total").each(function( index ) {
+        //         total+= parseInt(($(this).val() == "") ? 0 : $(this).val());
+        //     });
+        // <td><input type="text" name="sub_total[]" class="cart-sub-total form-control" /></td>
+            
+        //     $("#grand_total").val(total);
+        // }
+
         function calculate_total(){
             let total = 0;
-            $(".cart-sub-total").each(function( index ) {
-                total+= parseInt(($(this).val() == "") ? 0 : $(this).val());
+            console.log(total)
+            
+            $(".cart-sub-total-input").each(function( index ) {
+                let sub_total = parseFloat($(this).val());
+                console.log(sub_total)
+                total+=  isNaN(sub_total) ? 0 : sub_total; 
+                console.log(total)
+                
             });
             
-            $("#grand_total").val(total);
+            let grand_total = total;
+            
+            $("#total").val(total);
+            
+            $("#grand_total").val(grand_total);
+
+            $(".cart-total").html(showCurrency(total));
+            
+            $(".cart-grand-total").html(showCurrency(grand_total));
+            
+        }
+
+        function calculate_subtotal(){
+            let index = $(this).index(".cart-price");
+            let price = $(".cart-price").eq(index).val();
+            let qty = $(".cart-qty").eq(index).val();
+            // let total = 0;
+            
+
+            let sub_total = price * qty;
+            
+            
+            $(".cart-sub-total").eq(index).html(showCurrency(sub_total))
+            $(".cart-sub-total").eq(index).data("val", sub_total)
+            $(".cart-sub-total-input").eq(index).val(sub_total)
+
+            
         }
 
         function render_cart_number(){
@@ -142,9 +190,9 @@
             $('#code').val("");
             $('#name').val("");
             $('#unit_id').val("");
-            $('#amount').val("");
-            $('#purchase_price').val("");
-            $('#selling_price').val("");
+            // $('#amount').val("");
+            // $('#purchase_price').val("");
+            // $('#selling_price').val("");
             $('#goods-modal').modal('show');
         });
 
@@ -225,8 +273,12 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="name">Total</label>
-                                        <input value="{{$receiving->grand_total}}" type="text" id="grand_total" class="form-control" name="grand_total" value="0">
+                                        {{-- <label for="name">Total</label>
+                                        <input value="{{$receiving->grand_total}}" type="text" id="grand_total" class="form-control" name="grand_total" value="0"> --}}
+                                        <label for="name">Grand Total</label>
+                                        <h3 class="cart-grand-total text-right">Rp {{$receiving->grand_total}}</h3>
+                                        <input type="hidden" id="total" name="total" value="{{$receiving->grand_total}}">
+                                        <input type="hidden" id="grand_total" class="form-control" name="grand_total" value="{{$receiving->grand_total}}">
                                     </div>
                                 </div>
                                 <div class="col-md-12">
@@ -265,6 +317,7 @@
                                             <th>Unit</th>
                                             <th style="min-width:120px">Price</th>
                                             <th style="min-width:120px">Sub Total</th>
+                                            <th style="min-width:120px">Selling Price</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -275,6 +328,7 @@
                                             <td>
                                                 <input value="{{$detail->goods_id}}" type="hidden" name="goods_id[]" class="cart-goods-id" />
                                                 <input value="{{$detail->unit_id}}" type="hidden" name="unit_id[]" class="cart-unit-id" />
+                                                <input value="{{$detail->sub_total}}" type="hidden" name="sub_total[]" class="cart-sub-total-input" />
                                                 <select class="cart-goods select-goods form-control" style="width:100% !important" required>
                                                     <option></option>
                                                     @foreach($goods as $good)
@@ -284,8 +338,10 @@
                                             </td>
                                             <td><input value="{{$detail->qty}}" type="text" class="cart-qty form-control" name="qty[]" placeholder="Qty" value="" required autofocus></td>
                                             <td class="cart-unit">{{$detail->unit->name}}</td>
-                                            <td><input value="{{$detail->price}}" type="text" name="price[]" class="cart-price form-control" /></td>
-                                            <td><input value="{{$detail->sub_total}}" type="text" name="sub_total[]" class="cart-sub-total form-control" /></td>
+                                            <td><input value="{{$detail->price}}" type="text" name="price[]" class="cart-price form-control" required autofocus/></td>
+                                            <td class="cart-sub-total text-right" value="{{$detail->sub_total}}">{{$detail->sub_total}}</td>
+                                            {{-- <td><input value="{{$detail->sub_total}}" type="text" name="sub_total[]" class="cart-sub-total form-control" /></td> --}}
+                                            <td><input value="{{$detail->selling_price}}" type="text" name="selling_price[]" class="cart-selling-price form-control" required autofocus/></td>
                                             <td>
                                                 <button type="button" class="btn-dlt-cart btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
                                                     <i data-feather="trash"></i>
@@ -297,7 +353,7 @@
                                     <tfoot>
                                         
                                         <tr>
-                                            <td colspan=6>           
+                                            <td colspan=10>           
                                                 <button id="btn-add-goods" type="button" class="btn btn-primary btn-icon w-100" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
                                                     <i data-feather="plus"></i>ADD ITEM
                                                 </button>
@@ -349,7 +405,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="form-group">
+                {{-- <div class="form-group">
                     <label for="amount">Amount</label>
                     <input type="number" class="form-control" id="amount" name="amount" required autofocus>                     
                 </div>
@@ -360,7 +416,7 @@
                 <div class="form-group">
                     <label for="selling_price">Selling Price</label>
                     <input type="number" class="form-control" id="selling_price" name="selling_price" required autofocus>                     
-                </div>
+                </div> --}}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
