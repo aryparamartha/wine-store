@@ -217,7 +217,8 @@
                 </div>      
                 <div class="form-group">
                     <label for="address">Address</label>
-                    <input type="text" class="form-control" id="address" name="address" autofocus>                     
+                    <textarea class="form-control" name="address" id="address" form="customer-form"></textarea>
+                    {{-- <input type="text" class="form-control" id="address" name="address" autofocus>                      --}}
                 </div>      
                 <div class="form-group">
                     <label for="number">Number</label>

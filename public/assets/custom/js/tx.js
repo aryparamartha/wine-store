@@ -195,7 +195,7 @@ $(function() {
         let goods = JSON.parse($(this).val());
 
         $(".cart-goods-id").eq(index).val(goods.id)
-        $(".cart-price").eq(index).val(goods.purchase_price)
+        $(".cart-price").eq(index).val(goods.selling_price)
         $(".cart-unit-id").eq(index).val(goods.unit.id)
         $(".cart-unit").eq(index).html(goods.unit.name)
 
