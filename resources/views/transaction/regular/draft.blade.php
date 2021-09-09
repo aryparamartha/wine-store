@@ -304,11 +304,11 @@
                                                 </td>
                                                 <td class="cart-sub-total text-right">{{$tx->showCurrency($detail->sub_total)}}</td>
                                                 <td>
-                                                    @if($tx->status=="unpaid")
+                                                    {{-- @if($tx->status=="unpaid") --}}
                                                     <button type="button" class="btn-dlt-cart update-stock btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
                                                         <i data-feather="trash"></i>
                                                     </button>
-                                                    @endif
+                                                    {{-- @endif --}}
                                                 </td>
                                             </tr>
                                             @endforeach

@@ -128,11 +128,11 @@
                                         <a href="{{route('tx.compliment.invoice', $tx)}}" target="_blank" class="btn btn-light btn-icon">
                                             <i data-feather="printer"></i>
                                         </a>
-                                        @if($tx->status!="paid")
+                                        {{-- @if($tx->status!="paid") --}}
                                         <a href="{{route('tx.compliment.draft', $tx)}}" class="btn btn-primary btn-icon">
                                             <i data-feather="edit"></i>
                                         </a>
-                                        @endif
+                                        {{-- @endif --}}
                                         @if($tx->status=="unpaid")
                                         <form class="frm-dlt-alert" action="{{route('tx.compliment.delete', $tx)}}" method="post" style="display: inline-block;">
                                             @csrf

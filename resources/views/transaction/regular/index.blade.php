@@ -130,11 +130,11 @@
                                         <a href="{{route('tx.regular.invoice', $tx)}}" target="_blank" class="btn btn-light btn-icon">
                                             <i data-feather="printer"></i>
                                         </a>
-                                        @if($tx->status!="paid")
+                                        {{-- @if($tx->status!="paid") --}}
                                         <a href="{{route('tx.regular.draft', $tx)}}" class="btn btn-primary btn-icon">
                                             <i data-feather="edit"></i>
                                         </a>
-                                        @endif
+                                        {{-- @endif --}}
                                         @if($tx->status=="unpaid")
                                         <form class="frm-dlt-alert" action="{{route('tx.regular.delete', $tx)}}" method="post" style="display: inline-block;">
                                             @csrf

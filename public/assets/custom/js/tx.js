@@ -82,6 +82,7 @@ $(function() {
     $("#goods-cart").on('change blur', '.cart-disc', change_disc)
     $("#goods-cart").on('change blur', '.cart-disc-price', change_disc_price)
     $("#goods-cart").on('click', '.btn-dlt-cart', delete_cart)
+    console.log("disini");
     
     $("#payment-wrap").on('click', '.btn-dlt-payment', delete_payment)
     $("#payment-wrap").on('change blur', '.select-payment-id', change_payment)
@@ -309,8 +310,10 @@ $(function() {
     function render_delete_item_btn(){
         $(".btn-dlt-cart").show();
         if($(".btn-dlt-cart").length == 1){
+            console.log("hide");
             $(".btn-dlt-cart").hide();
         }
+        console.log("disana");
     }
 
     function render_delete_payment_btn(){
