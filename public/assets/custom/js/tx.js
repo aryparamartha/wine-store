@@ -79,8 +79,8 @@ $(function() {
     $("#goods-cart").on('change blur', '.select-goods', change_selected_goods)
     $("#goods-cart").on('change blur', '.cart-qty', change_qty)
     $("#goods-cart").on('change blur', '.cart-price', change_price)
-    $("#goods-cart").on('change blur', '.cart-disc', change_disc)
-    $("#goods-cart").on('change blur', '.cart-disc-price', change_disc_price)
+    $("#goods-cart").on('change blur', '.cart-disc', change_disc_price)
+    $("#goods-cart").on('change blur', '.cart-disc-price', change_disc)
     $("#goods-cart").on('click', '.btn-dlt-cart', delete_cart)
     console.log("disini");
     
@@ -130,12 +130,19 @@ $(function() {
     function change_discount(index){
         let price = $(".cart-price").eq(index).val();
         let qty = $(".cart-qty").eq(index).val();
-        let disc = $(".cart-disc").eq(index).val();
-        
-        let sub_total = price * qty;
-        let discount = sub_total * ( disc / 100);
+        let disc_price = $(".cart-disc-price").eq(index).val();
 
-        $(".cart-disc-price").eq(index).val(discount)
+        console.log("change-disc jalan")
+        
+        // let sub_total = price * qty;
+        // let discount = sub_total * ( disc / 100);
+
+        let sub_total = price * qty;
+        let discount = (disc_price/sub_total)*100;
+
+        console.log(discount)
+
+        $(".cart-disc").eq(index).val(discount)
         calculate_sub_total(index)
         calculate_total();
     }
@@ -146,21 +153,28 @@ $(function() {
     }
 
     function change_disc(){
-        let index = $(this).index(".cart-disc"); 
+        let index = $(this).index(".cart-disc-price"); 
+        console.log("ini juga jalan")
         change_discount(index);
     }
     
     function change_disc_price(){
-        let index = $(this).index(".cart-disc-price"); 
+        let index = $(this).index(".cart-disc"); 
         
         let price = $(".cart-price").eq(index).val();
         let qty = $(".cart-qty").eq(index).val();
-        let disc_price = $(this).val();
-        
-        let sub_total = price * qty;
-        let discount = (disc_price/sub_total)*100;
+        let disc = $(this).val();
 
-        $(".cart-disc").eq(index).val(discount)
+        console.log("wtf")
+
+        let sub_total = price * qty;
+        let discount = sub_total * ( disc / 100);
+
+        console.log("change-disc-price jalan")
+        
+        
+
+        $(".cart-disc-price").eq(index).val(discount)
         change_discount(index);
     }
 
@@ -358,6 +372,7 @@ $(function() {
                 stock_valid = false;
             }
             change_discount(index);
+            console.log("stock valid or smth")
         }) 
         if(stock_valid){
             $(this).unbind();
