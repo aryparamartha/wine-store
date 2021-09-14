@@ -115,12 +115,22 @@
                         <tbody id="goods-cart">
                             @foreach($items as $key => $item)
                             <tr>
+                                @php
+                                    $price = $item->price;
+                                    $qty = $item->qty;
+                                    $disc = $item->disc;
+
+                                    $sub_total = $price * $qty;
+                                    $numb_disc = $sub_total * ($disc / 100);
+                                @endphp
+                                    
+                            
                                 <td class="cart-no">{{ $key+1 }}</td>
                                 <td>{{ $item->goods->code}} - {{ $item->goods->name}}</td>
                                 <td>{{ $item->qty }}</td>
                                 <td>{{ $item->unit->name }}</td>
                                 <td class="text-right">{{ $tx->showCurrency($item->price) }}</td>
-                                <td class="text-right">{{ $item->disc }}%</td>
+                                <td class="text-right">{{ $tx->showCurrency($numb_disc) }}</td>
                                 <td class="text-right">{{ $tx->showCurrency($item->sub_total) }}</td>
                             </tr>
                             @endforeach

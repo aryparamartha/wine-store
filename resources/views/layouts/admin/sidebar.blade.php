@@ -42,7 +42,7 @@
             <li class="nav-item">
                 <a href="{{route('goods.index')}}" class="nav-link">
                     <i class="link-icon" data-feather="package"></i>
-                    <span class="link-title">Stocks</span>
+                    <span class="link-title">Stock</span>
                 </a>
             </li>
             <li class="nav-item {{(isset($sidebar) && $sidebar=='receiving') ? 'active' : ''}}">

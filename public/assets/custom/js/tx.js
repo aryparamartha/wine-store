@@ -97,6 +97,7 @@ $(function() {
     $("#btn-add-payment").click(function(){
         $("#payment-body").append(paymentTemplate);
         $(".select-payment-id").select2({placeholder: "Select Payment Method", width: '100%'});
+        $("#paid-amount").prop('required', true);
 
         render_payment_number();
     });
