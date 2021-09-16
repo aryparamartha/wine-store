@@ -109,6 +109,7 @@
                                 <th>Unit</th>
                                 <th class="text-right">Price</th>
                                 <th class="text-right">Discount</th>
+                                <th class="text-right">Final Price</th>
                                 <th class="text-right">Sub Total</th>
                             </tr>
                         </thead>
@@ -120,8 +121,11 @@
                                     $qty = $item->qty;
                                     $disc = $item->disc;
 
-                                    $sub_total = $price * $qty;
-                                    $numb_disc = $sub_total * ($disc / 100);
+                                    // $sub_total = $price * $qty;
+                                    $numb_disc = $price * ($disc / 100);
+
+                                    $price_adisc = $price - $numb_disc;
+                                    $sub_total = $price_adisc * $qty;
                                 @endphp
                                     
                             
@@ -131,6 +135,7 @@
                                 <td>{{ $item->unit->name }}</td>
                                 <td class="text-right">{{ $tx->showCurrency($item->price) }}</td>
                                 <td class="text-right">{{ $tx->showCurrency($numb_disc) }}</td>
+                                <td class="text-right">{{ $tx->showCurrency($price_adisc) }}</td>
                                 <td class="text-right">{{ $tx->showCurrency($item->sub_total) }}</td>
                             </tr>
                             @endforeach
@@ -151,7 +156,7 @@
                             </tr>
                             @else
                             <tr>
-                                <td colspan=6 class="text-right"><b>Grand Total :</b></td>
+                                <td colspan=7 class="text-right"><b>Grand Total :</b></td>
                                 <td class="cart-grand-total text-right"><b>{{ $tx->showCurrency($tx->total) }}</b></td>
                             </tr>
                             @endif

@@ -277,6 +277,7 @@
                                                 <th>Unit</th>
                                                 <th style="min-width:130px">Price</th>
                                                 <th>Discount</th>
+                                                <th>Final Price</th>
                                                 <th>Sub Total</th>
                                                 <th>Action</th>
                                             </tr>
@@ -285,6 +286,9 @@
                                             @foreach($details as $key => $detail)
                                             <tr>
                                                 <td class="cart-no">{{$key+1}}</td>
+                                                @php
+                                                    $disc_price = ($detail->price * $detail->qty) * ($detail->disc/100);
+                                                @endphp
                                                 <td>
                                                     <input value="{{$detail->id}}"type="hidden" name="tx_detail_id[]" />
                                                     <input type="hidden" name="goods_id[]" class="cart-goods-id" />
@@ -302,6 +306,7 @@
                                                     Rp<input readonly value="{{($detail->price * $detail->qty) * ($detail->disc/100)}}" style="display: inline-block; width: 100px !important" type="text" class="cart-disc-price form-control" />
                                                     </div>
                                                 </td>
+                                                <td class="cart-final-price text-right">{{$detail->price - $disc_price}}</td>
                                                 <td class="cart-sub-total text-right">{{$tx->showCurrency($detail->sub_total)}}</td>
                                                 <td>
                                                     {{-- @if($tx->status=="unpaid") --}}
@@ -316,7 +321,7 @@
                                         <tfoot>
                                             
                                             <tr>
-                                                <td colspan=7>           
+                                                <td colspan=10>           
                                                     <button id="btn-add-goods" type="button" class="btn btn-primary btn-icon w-100" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
                                                         <i data-feather="plus"></i>ADD ITEM
                                                     </button>
@@ -324,15 +329,15 @@
                                             </tr>
 
                                             <tr>
-                                                <td colspan=6 class="text-right">Total:</td>
+                                                <td colspan=7 class="text-right">Total:</td>
                                                 <td class="cart-total text-right">{{$tx->showCurrency($tx->total)}}</td>
                                             </tr>
                                             <tr>
-                                                <td colspan=6 class="text-right">Tax (10%):</td>
+                                                <td colspan=7 class="text-right">Tax (10%):</td>
                                                 <td class="cart-tax text-right">{{$tx->showCurrency($tx->tax)}}</td>
                                             </tr>
                                             <tr>
-                                                <td colspan=6 class="text-right">Grand Total:</td>
+                                                <td colspan=7 class="text-right">Grand Total:</td>
                                                 <td class="cart-grand-total text-right">{{$tx->showCurrency($tx->grand_total)}}</td>
                                             </tr>
                                         </tfoot>

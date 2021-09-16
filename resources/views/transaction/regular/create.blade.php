@@ -241,6 +241,7 @@
                                             <th>Unit</th>
                                             <th style="min-width:130px">Price</th>
                                             <th>Discount</th>
+                                            <th>Final Price</th>
                                             <th>Sub Total</th>
                                             <th>Action</th>
                                         </tr>
@@ -268,6 +269,7 @@
                                                 Rp<input style="display: inline-block; width: 100px !important" type="text" class="cart-disc-price form-control" />
                                                 </div>
                                             </td>
+                                            <td class="cart-final-price text-right"></td>
                                             <td class="cart-sub-total text-right"></td>
                                             <td>
                                                 <button type="button" class="btn-dlt-cart btn btn-danger btn-icon" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
@@ -279,7 +281,7 @@
                                     <tfoot>
                                         
                                         <tr>
-                                            <td colspan=7>           
+                                            <td colspan=10>           
                                                 <button id="btn-add-goods" type="button" class="btn btn-primary btn-icon w-100" data-title="Delete Product" data-text="Are you sure you want to delete this data?">
                                                     <i data-feather="plus"></i>ADD ITEM
                                                 </button>
@@ -287,15 +289,15 @@
                                         </tr>
 
                                         <tr>
-                                            <td colspan=6 class="text-right">Total:</td>
+                                            <td colspan=7 class="text-right">Total:</td>
                                             <td class="cart-total text-right">-</td>
                                         </tr>
                                         <tr>
-                                            <td colspan=6 class="text-right">Tax (10%):</td>
+                                            <td colspan=7 class="text-right">Tax (10%):</td>
                                             <td class="cart-tax text-right">-</td>
                                         </tr>
                                         <tr>
-                                            <td colspan=6 class="text-right">Grand Total:</td>
+                                            <td colspan=7 class="text-right">Grand Total:</td>
                                             <td class="cart-grand-total text-right">-</td>
                                         </tr>
                                     </tfoot>
