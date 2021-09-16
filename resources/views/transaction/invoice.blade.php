@@ -94,9 +94,9 @@
                         </table>
                     </div>
                     <div class="col-md-6 col-6">
-                        {{-- <div class="flt-right">
-                            <img max-height="110px" width="110px" src="/{{$comp_profile->logo}}" />
-                        </div>   --}}
+                        <div class="flt-right">
+                            <img max-height="110px" width="110px" src="/assets/images/logo/{{$comp_profile->logo}}" />
+                        </div>  
                     </div>
                 </div>
                 <div class="table-responsive">
