@@ -64,6 +64,9 @@
                         <table style="width: 100%">
                             <thead>
                                 <tr>
+                                    <th>Date : {{$tx->created_at}}</th>
+                                </tr>
+                                <tr>
                                     <th width="50%">From :</th>
                                     <th>To :</th>
                                 </tr>
@@ -134,7 +137,11 @@
                                 <td>{{ $item->qty }}</td>
                                 <td>{{ $item->unit->name }}</td>
                                 <td class="text-right">{{ $tx->showCurrency($item->price) }}</td>
+                                @if($disc == 0)
+                                <td class="text-right"> </td>
+                                @else
                                 <td class="text-right">{{ $tx->showCurrency($numb_disc) }}</td>
+                                @endif
                                 <td class="text-right">{{ $tx->showCurrency($price_adisc) }}</td>
                                 <td class="text-right">{{ $tx->showCurrency($item->sub_total) }}</td>
                             </tr>
