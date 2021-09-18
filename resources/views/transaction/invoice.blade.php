@@ -64,7 +64,7 @@
                         <table style="width: 100%">
                             <thead>
                                 <tr>
-                                    <th>Date : {{$tx->created_at}}</th>
+                                    <th>Date : {{$tx->created_at->format('d M Y')}}</th>
                                 </tr>
                                 <tr>
                                     <th width="50%">From :</th>
