@@ -303,7 +303,7 @@
                                             <td>
                                                 <div style="display: block">%
                                                 <input readonly value="{{$detail->disc}}" style="display: inline-block; width: 60px !important" type="text" class="cart-disc form-control" name="disc[]" placeholder="Disc" value="" autofocus>
-                                                Rp<input readonly value="{{$disc_price}}" style="display: inline-block; width: 100px !important" type="text" class="cart-disc-price form-control" />
+                                                Rp<input readonly value="{{$detail->price * ($detail->disc/100)}}" style="display: inline-block; width: 100px !important" type="text" class="cart-disc-price form-control" />
                                                 </div>
                                             </td>
                                             <td class="cart-final-price text-right">{{$detail->price - $disc_price}}</td>
