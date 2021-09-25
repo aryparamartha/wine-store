@@ -287,7 +287,7 @@
                                         <tr>
                                             <td class="cart-no">{{$key+1}}</td>
                                             @php
-                                                $disc_price = ($detail->price * $detail->qty) * ($detail->disc/100);
+                                                $disc_price = $detail->price * ($detail->disc/100);
                                             @endphp
                                             <td>
                                                 <input value="{{$detail->id}}"type="hidden" name="tx_detail_id[]" />
